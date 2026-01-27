@@ -50,11 +50,19 @@ MyPortfolio/
    ```
 
 2. **Update database connection**
-   Edit `appsettings.json` and update the connection string:
+   Edit `appsettings.json` and update the connection string.
+   
+   For Windows Authentication:
    ```json
    "ConnectionStrings": {
-     "DefaultConnection": "Server=localhost;Database=portfolio_db;..."
+     "DefaultConnection": "Server=localhost;Database=portfolio_db;Integrated Security=true;TrustServerCertificate=true;"
    }
+   ```
+   
+   For SQL Server Authentication (use environment variables or user secrets):
+   ```bash
+   dotnet user-secrets init
+   dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost;Database=portfolio_db;User Id=your_username;Password=your_password;TrustServerCertificate=true;"
    ```
 
 3. **Run migrations** (if using Entity Framework)
