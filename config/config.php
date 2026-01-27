@@ -20,6 +20,24 @@ if (!isset($_SESSION['lang'])) {
     $_SESSION['lang'] = 'en';
 }
 
+// File upload settings
+define('MAX_FILE_SIZE', 5 * 1024 * 1024); // 5MB
+define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+define('ALLOWED_IMAGE_EXTENSIONS', ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+define('UPLOAD_DIR', PUBLIC_PATH . '/uploads/');
+
+// Security settings
+define('PRODUCTION_MODE', false); // Set to true in production
+
+// Environment-based error reporting
+if (PRODUCTION_MODE) {
+    ini_set('display_errors', 0);
+    error_reporting(0);
+} else {
+    ini_set('display_errors', 1);
+    error_reporting(E_ALL);
+}
+
 // Autoload function
 spl_autoload_register(function ($class) {
     $paths = [

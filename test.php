@@ -5,6 +5,13 @@
  * Delete this file after successful installation for security.
  */
 
+require_once __DIR__ . '/config/config.php';
+
+// Prevent access to this file in production
+if (defined('PRODUCTION_MODE') && PRODUCTION_MODE === true) {
+    die('Access denied. This file should be deleted in production.');
+}
+
 echo "<h1>Portfolio Database Connection Test</h1>";
 echo "<hr>";
 

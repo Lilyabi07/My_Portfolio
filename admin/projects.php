@@ -22,33 +22,60 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $projectModel->technologies = $_POST['technologies'] ?? '';
         $projectModel->display_order = $_POST['display_order'] ?? 0;
         
-        // Handle image upload
+        // Handle image upload with security validation
         $imageName = $_POST['existing_image'] ?? '';
         if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            $targetDir = __DIR__ . '/../public/uploads/';
-            if (!file_exists($targetDir)) {
-                mkdir($targetDir, 0777, true);
+            // Validate file size
+            if ($_FILES['image']['size'] > MAX_FILE_SIZE) {
+                $error = 'File size too large. Maximum ' . (MAX_FILE_SIZE / 1024 / 1024) . 'MB allowed.';
+            } else {
+                // Validate file type
+                $fileType = mime_content_type($_FILES['image']['tmp_name']);
+                
+                if (!in_array($fileType, ALLOWED_IMAGE_TYPES)) {
+                    $error = 'Invalid file type. Only JPG, PNG, GIF, and WebP images are allowed.';
+                } else {
+                    // Validate file extension
+                    $fileExtension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+                    
+                    if (!in_array($fileExtension, ALLOWED_IMAGE_EXTENSIONS)) {
+                        $error = 'Invalid file extension.';
+                    } else {
+                        if (!file_exists(UPLOAD_DIR)) {
+                            mkdir(UPLOAD_DIR, 0755, true);
+                        }
+                        
+                        // Generate secure filename
+                        $imageName = uniqid('project_', true) . '.' . $fileExtension;
+                        $targetFile = UPLOAD_DIR . $imageName;
+                        
+                        if (!move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
+                            $error = 'Failed to upload file.';
+                            $imageName = $_POST['existing_image'] ?? '';
+                        }
+                    }
+                }
             }
-            $imageName = time() . '_' . basename($_FILES['image']['name']);
-            $targetFile = $targetDir . $imageName;
-            move_uploaded_file($_FILES['image']['tmp_name'], $targetFile);
         }
         $projectModel->image = $imageName;
         
-        if ($_POST['action'] == 'add') {
-            if ($projectModel->create()) {
-                $success = 'Project added successfully!';
-                $action = 'list';
-            } else {
-                $error = 'Failed to add project.';
-            }
-        } elseif ($_POST['action'] == 'edit' && $_POST['id']) {
-            $projectModel->id = $_POST['id'];
-            if ($projectModel->update()) {
-                $success = 'Project updated successfully!';
-                $action = 'list';
-            } else {
-                $error = 'Failed to update project.';
+        // Only proceed with add/update if no upload errors
+        if (empty($error)) {
+            if ($_POST['action'] == 'add') {
+                if ($projectModel->create()) {
+                    $success = 'Project added successfully!';
+                    $action = 'list';
+                } else {
+                    $error = 'Failed to add project.';
+                }
+            } elseif ($_POST['action'] == 'edit' && $_POST['id']) {
+                $projectModel->id = $_POST['id'];
+                if ($projectModel->update()) {
+                    $success = 'Project updated successfully!';
+                    $action = 'list';
+                } else {
+                    $error = 'Failed to update project.';
+                }
             }
         }
     }

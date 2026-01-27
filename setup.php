@@ -5,13 +5,13 @@ header("X-XSS-Protection: 1; mode=block");
 header("X-Content-Type-Options: nosniff");
 header("Referrer-Policy: strict-origin-when-cross-origin");
 
-// Prevent access to this file in production
-// Comment this out during development
-// if ($_SERVER['REMOTE_ADDR'] !== '127.0.0.1' && $_SERVER['REMOTE_ADDR'] !== '::1') {
-//     die('Access denied');
-// }
-
 require_once __DIR__ . '/config/config.php';
+
+// Prevent access to this file in production
+if (defined('PRODUCTION_MODE') && PRODUCTION_MODE === true) {
+    die('Access denied. This file should be deleted in production.');
+}
+
 require_once __DIR__ . '/config/database.php';
 
 $errors = [];
