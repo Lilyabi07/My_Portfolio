@@ -1,0 +1,46 @@
+.skills-manager h2 {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.skill-form {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.skill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.skill-item:last-child {
+  border-bottom: none;
+}
+
+.skill-info {
+  flex: 1;
+}
+
+.skill-names {
+  margin-bottom: 0.5rem;
+}
+
+.skill-percentage {
+  min-width: 200px;
+}
+
+.skill-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.skills-list {
+  border: 1px solid #e9ecef;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}

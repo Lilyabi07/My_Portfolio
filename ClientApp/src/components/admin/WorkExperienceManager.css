@@ -1,0 +1,67 @@
+.experience-manager h2 {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.experience-form {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.timeline {
+  position: relative;
+  padding: 2rem 0;
+}
+
+.timeline-item {
+  display: flex;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.timeline-marker {
+  width: 16px;
+  height: 16px;
+  background-color: #2a6ee6;
+  border-radius: 50%;
+  position: absolute;
+  left: -28px;
+  top: 8px;
+  border: 3px solid white;
+  box-shadow: 0 0 0 3px #2a6ee6;
+}
+
+.timeline-item:first-child .timeline-marker {
+  background-color: #28a745;
+  box-shadow: 0 0 0 3px #28a745;
+}
+
+.timeline-content {
+  padding-left: 2rem;
+  border-left: 2px solid #e9ecef;
+  padding-bottom: 1rem;
+}
+
+.timeline-content h5 {
+  margin-bottom: 0.25rem;
+  color: #333;
+}
+
+.timeline-content .company {
+  font-weight: 600;
+  color: #2a6ee6;
+  margin: 0.25rem 0;
+}
+
+.timeline-content .dates {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0.5rem 0;
+}
+
+.timeline-content .actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}

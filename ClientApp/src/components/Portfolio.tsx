@@ -51,43 +51,51 @@ const Portfolio: React.FC = () => {
       <section className="skills-section container">
         <h2 className="text-center mb-4">Skills</h2>
         <div className="row">
-          {skills.map((skill) => (
-            <div key={skill.id} className="col-md-4">
-              <div className="skill-card">
-                <i className={`fas ${skill.icon} fa-3x mb-3`}></i>
-                <h4>{skill.name}</h4>
-                <div className="progress">
-                  <div
-                    className="progress-bar"
-                    role="progressbar"
-                    style={{ width: `${skill.proficiency}%` }}
-                    aria-valuenow={skill.proficiency}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                  >
-                    {skill.proficiency}%
+          {Array.isArray(skills) && skills.length > 0 ? (
+            skills.map((skill) => (
+              <div key={skill.id} className="col-md-4">
+                <div className="skill-card">
+                  <i className={`fas ${skill.icon} fa-3x mb-3`}></i>
+                  <h4>{skill.name}</h4>
+                  <div className="progress">
+                    <div
+                      className="progress-bar"
+                      role="progressbar"
+                      style={{ width: `${skill.proficiency}%` }}
+                      aria-valuenow={skill.proficiency}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                    >
+                      {skill.proficiency}%
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="col-12 text-center">No skills available.</p>
+          )}
         </div>
       </section>
 
       <section className="projects-section container">
         <h2 className="text-center mb-4">Projects</h2>
         <div className="row">
-          {projects.map((project) => (
-            <div key={project.id} className="col-md-6">
-              <div className="project-card">
-                <h3>{project.title}</h3>
-                <p>{project.description}</p>
-                <p className="text-muted">
-                  <strong>Technologies:</strong> {project.technologies}
-                </p>
+          {Array.isArray(projects) && projects.length > 0 ? (
+            projects.map((project) => (
+              <div key={project.id} className="col-md-6">
+                <div className="project-card">
+                  <h3>{project.title}</h3>
+                  <p>{project.description}</p>
+                  <p className="text-muted">
+                    <strong>Technologies:</strong> {project.technologies}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="col-12 text-center">No projects available.</p>
+          )}
         </div>
       </section>
     </div>

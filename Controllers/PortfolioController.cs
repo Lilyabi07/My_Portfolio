@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MyPortfolio.Data;
 using MyPortfolio.Models;
-using System.Collections.Generic;
 
 namespace MyPortfolio.Controllers
 {
@@ -8,31 +9,30 @@ namespace MyPortfolio.Controllers
     [Route("api/[controller]")]
     public class PortfolioController : ControllerBase
     {
-        [HttpGet("skills")]
-        public IActionResult GetSkills()
+        private readonly ApplicationDbContext _db;
+
+        public PortfolioController(ApplicationDbContext db)
         {
-            var skills = new List<Skill>
-            {
-                new Skill { Id = 1, Name = "C# / .NET", Proficiency = 90, Icon = "fa-code" },
-                new Skill { Id = 2, Name = "React", Proficiency = 85, Icon = "fa-react" },
-                new Skill { Id = 3, Name = "ASP.NET MVC", Proficiency = 88, Icon = "fa-server" }
-            };
+            _db = db;
+        }
+
+        // GET: /api/portfolio/skills
+        [HttpGet("skills")]
+        public async Task<IActionResult> GetSkills()
+        {
+            var skills = await _db.Skills
+                .OrderBy(s => s.DisplayOrder)
+                .ToListAsync();
             return Ok(skills);
         }
 
+        // GET: /api/portfolio/projects
         [HttpGet("projects")]
-        public IActionResult GetProjects()
+        public async Task<IActionResult> GetProjects()
         {
-            var projects = new List<Project>
-            {
-                new Project 
-                { 
-                    Id = 1, 
-                    Title = "Portfolio Website", 
-                    Description = "Modern portfolio built with ASP.NET MVC and React",
-                    Technologies = "ASP.NET, React, Entity Framework"
-                }
-            };
+            var projects = await _db.Projects
+                .OrderBy(p => p.DisplayOrder)
+                .ToListAsync();
             return Ok(projects);
         }
     }

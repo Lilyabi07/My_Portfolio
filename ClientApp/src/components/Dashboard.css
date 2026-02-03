@@ -1,0 +1,25 @@
+.dashboard-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.nav-pills .nav-link {
+  color: #495057;
+  border-radius: 0;
+  margin-bottom: 0.5rem;
+}
+
+.nav-pills .nav-link:hover {
+  background-color: #e9ecef;
+}
+
+.nav-pills .nav-link.active {
+  background-color: #2a6ee6;
+}
+
+.tab-content {
+  background: white;
+  border-radius: 0;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

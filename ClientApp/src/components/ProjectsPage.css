@@ -1,0 +1,145 @@
+.projects-page {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.projects-hero {
+  background: linear-gradient(135deg, #0a0e27 0%, #2a6ee6 100%);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.projects-hero-content h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.projects-hero-content p {
+  font-size: 1.1rem;
+  opacity: 0.95;
+}
+
+.projects-list {
+  background: #f8f9fa;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 1rem;
+}
+
+.loading .spinner-border {
+  border-color: #2a6ee6;
+  border-right-color: transparent;
+}
+
+.project-card {
+  background: white;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 114, 177, 0.1);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 114, 177, 0.2);
+}
+
+.project-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #e9ecef;
+}
+
+.project-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.project-card:hover .project-image img {
+  transform: scale(1.05);
+}
+
+.project-content {
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0a0e27;
+  margin-bottom: 0.75rem;
+}
+
+.project-description {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.project-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tech-badge {
+  background: linear-gradient(135deg, #0a0e27 0%, #2a6ee6 100%);
+  color: white;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.project-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.project-links .btn-link {
+  color: #2a6ee6;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0;
+  border: 1px solid #2a6ee6;
+  transition: all 0.3s ease;
+  flex: 1;
+  text-align: center;
+}
+
+.project-links .btn-link:hover {
+  background-color: #2a6ee6;
+  color: white;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .projects-hero-content h1 {
+    font-size: 1.75rem;
+  }
+
+  .projects-hero-content p {
+    font-size: 0.95rem;
+  }
+}
