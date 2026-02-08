@@ -21,6 +21,12 @@ builder.Services.AddSignalR();
 // Register NotificationService
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
+// Register EmailService
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+// Register ProfanityFilterService
+builder.Services.AddScoped<IProfanityFilterService, ProfanityFilterService>();
+
 // CORS: explicitly allow the React dev server origins and enable preflight/credentials if needed
 var allowedOrigins = new[] { "http://localhost:3000", "https://localhost:3000" };
 builder.Services.AddCors(options =>

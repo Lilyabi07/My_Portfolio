@@ -16,22 +16,23 @@ namespace MyPortfolio.Controllers
         }
 
         protected abstract string EntityName { get; }
-        protected abstract IEnumerable<T> GetAllItems();
-        protected abstract T? GetItemById(int id);
-        protected abstract int AddItem(T item); // return created id
-        protected abstract bool UpdateItem(int id, T updated);
-        protected abstract bool DeleteItem(int id);
+        protected abstract Task<IEnumerable<T>> GetAllItemsAsync();
+        protected abstract Task<T?> GetItemByIdAsync(int id);
+        protected abstract Task<int> AddItemAsync(T item); // return created id
+        protected abstract Task<bool> UpdateItemAsync(int id, T updated);
+        protected abstract Task<bool> DeleteItemAsync(int id);
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return Ok(GetAllItems());
+            var items = await GetAllItemsAsync();
+            return Ok(items);
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var item = GetItemById(id);
+            var item = await GetItemByIdAsync(id);
             if (item == null) return NotFound();
             return Ok(item);
         }
@@ -40,7 +41,7 @@ namespace MyPortfolio.Controllers
         [Authorize]
         public virtual async Task<IActionResult> Create([FromBody] T model)
         {
-            var id = AddItem(model);
+            var id = await AddItemAsync(model);
             await _notifications.SendEntityChangedAsync(EntityName, "create", model);
             return CreatedAtAction(nameof(Get), new { id }, model);
         }
@@ -49,7 +50,7 @@ namespace MyPortfolio.Controllers
         [Authorize]
         public virtual async Task<IActionResult> Update(int id, [FromBody] T updated)
         {
-            var ok = UpdateItem(id, updated);
+            var ok = await UpdateItemAsync(id, updated);
             if (!ok) return NotFound();
             await _notifications.SendEntityChangedAsync(EntityName, "update", updated);
             return NoContent();
@@ -59,7 +60,7 @@ namespace MyPortfolio.Controllers
         [Authorize]
         public virtual async Task<IActionResult> Delete(int id)
         {
-            var ok = DeleteItem(id);
+            var ok = await DeleteItemAsync(id);
             if (!ok) return NotFound();
             await _notifications.SendEntityChangedAsync(EntityName, "delete", new { id });
             return NoContent();

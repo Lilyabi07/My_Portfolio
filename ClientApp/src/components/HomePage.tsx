@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Navigation from './Navigation';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import './HomePage.css';
 
 interface HomePageProps {
@@ -8,22 +10,23 @@ interface HomePageProps {
 }
 
 function HomePage({ onAdminClick }: HomePageProps) {
+  const { theme } = useTheme();
+  const { t } = useLanguage();
+
   return (
-    <div className="home-page">
+    <div className={`home-page theme-${theme}`}>
       <Navigation onAdminClick={onAdminClick} />
       
       <section className="hero-section">
         <div className="hero-content">
-          <h1 className="hero-title">Welcome to My Portfolio</h1>
-          <p className="hero-subtitle">
-            Showcasing projects, achievements, and professional experiences
-          </p>
+          <h1 className="hero-title">{t('home.heroTitle')}</h1>
+          <p className="hero-subtitle">{t('home.heroSubtitle')}</p>
           <div className="hero-buttons">
             <Link to="/projects" className="btn btn-primary btn-lg">
-              View Projects
+              {t('home.viewProjects')}
             </Link>
             <Link to="/about" className="btn btn-outline-primary btn-lg">
-              Learn About Me
+              {t('home.learnAbout')}
             </Link>
           </div>
         </div>
@@ -31,35 +34,35 @@ function HomePage({ onAdminClick }: HomePageProps) {
 
       <section className="highlights-section">
         <div className="container py-5">
-          <h2 className="section-title">Featured Highlights</h2>
+          <h2 className="section-title">{t('home.featuredHighlights')}</h2>
           <div className="row g-4">
             <div className="col-md-4">
               <div className="highlight-card">
                 {/* <div className="highlight-icon">📁</div> */}
-                <h3>Projects</h3>
-                <p>Explore my latest projects and technical achievements</p>
+                <h3>{t('nav.projects')}</h3>
+                <p>{t('home.projectsDescription')}</p>
                 <Link to="/projects" className="highlight-link">
-                  Browse Projects →
+                  {t('home.browseProjects')} →
                 </Link>
               </div>
             </div>
             <div className="col-md-4">
               <div className="highlight-card">
                 {/* <div className="highlight-icon">💬</div> */}
-                <h3>Testimonials</h3>
-                <p>See what clients and colleagues have to say</p>
+                <h3>{t('nav.testimonials')}</h3>
+                <p>{t('home.testimonialsDescription')}</p>
                 <Link to="/testimonials" className="highlight-link">
-                  Read Testimonials →
+                  {t('home.readTestimonials')} →
                 </Link>
               </div>
             </div>
             <div className="col-md-4">
               <div className="highlight-card">
                 {/* <div className="highlight-icon">👤</div> */}
-                <h3>About Me</h3>
-                <p>Discover my background, skills, and experience</p>
+                <h3>{t('nav.about')}</h3>
+                <p>{t('home.aboutDescription')}</p>
                 <Link to="/about" className="highlight-link">
-                  Learn More →
+                  {t('home.learnMore')} →
                 </Link>
               </div>
             </div>

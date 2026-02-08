@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyPortfolio.Data;
@@ -9,50 +8,39 @@ namespace MyPortfolio.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class EducationController : ControllerBase
+    public class EducationController : CrudControllerBase<Education>
     {
         private readonly ApplicationDbContext _db;
-        private readonly INotificationService _notifications;
 
         public EducationController(ApplicationDbContext db, INotificationService notifications)
+            : base(notifications)
         {
             _db = db;
-            _notifications = notifications;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        protected override string EntityName => "education";
+
+        protected override async Task<IEnumerable<Education>> GetAllItemsAsync()
         {
-            var items = await _db.Education.OrderBy(e => e.DisplayOrder).ToListAsync();
-            return Ok(items);
+            return await _db.Education.OrderBy(e => e.DisplayOrder).ToListAsync();
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        protected override async Task<Education?> GetItemByIdAsync(int id)
         {
-            var item = await _db.Education.FindAsync(id);
-            if (item == null) return NotFound();
-            return Ok(item);
+            return await _db.Education.FindAsync(id);
         }
 
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> Create([FromBody] Education model)
+        protected override async Task<int> AddItemAsync(Education item)
         {
-            await _db.Education.AddAsync(model);
+            await _db.Education.AddAsync(item);
             await _db.SaveChangesAsync();
-
-            await _notifications.SendEntityChangedAsync("education", "create", model);
-
-            return CreatedAtAction(nameof(Get), new { id = model.Id }, model);
+            return item.Id;
         }
 
-        [HttpPut("{id}")]
-        [Authorize]
-        public async Task<IActionResult> Update(int id, [FromBody] Education updated)
+        protected override async Task<bool> UpdateItemAsync(int id, Education updated)
         {
             var existing = await _db.Education.FindAsync(id);
-            if (existing == null) return NotFound();
+            if (existing == null) return false;
 
             existing.Institution = updated.Institution ?? existing.Institution;
             existing.Degree = updated.Degree ?? existing.Degree;
@@ -64,25 +52,17 @@ namespace MyPortfolio.Controllers
 
             _db.Education.Update(existing);
             await _db.SaveChangesAsync();
-
-            await _notifications.SendEntityChangedAsync("education", "update", existing);
-
-            return NoContent();
+            return true;
         }
 
-        [HttpDelete("{id}")]
-        [Authorize]
-        public async Task<IActionResult> Delete(int id)
+        protected override async Task<bool> DeleteItemAsync(int id)
         {
             var existing = await _db.Education.FindAsync(id);
-            if (existing == null) return NotFound();
+            if (existing == null) return false;
 
             _db.Education.Remove(existing);
             await _db.SaveChangesAsync();
-
-            await _notifications.SendEntityChangedAsync("education", "delete", new { id });
-
-            return NoContent();
+            return true;
         }
     }
 }

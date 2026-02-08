@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api';
 import './SkillsManager.css';
 
 interface Skill {
@@ -22,6 +22,9 @@ function SkillsManager() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const authConfig = {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
+  };
 
   useEffect(() => {
     fetchSkills();
@@ -30,7 +33,7 @@ function SkillsManager() {
   const fetchSkills = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/skills');
+      const response = await api.get('/skills');
       setSkills(response.data);
     } catch (err: any) {
       setError('Failed to load skills');
@@ -46,14 +49,10 @@ function SkillsManager() {
 
     try {
       if (editingId) {
-        await axios.put(`/api/skills/${editingId}`, formData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await api.put(`/skills/${editingId}`, formData, authConfig);
         setSuccess('Skill updated successfully!');
       } else {
-        await axios.post('/api/skills', formData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await api.post('/skills', formData, authConfig);
         setSuccess('Skill added successfully!');
       }
       resetForm();
@@ -67,9 +66,7 @@ function SkillsManager() {
     if (!window.confirm('Are you sure?')) return;
 
     try {
-      await axios.delete(`/api/skills/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      await api.delete(`/skills/${id}`, authConfig);
       setSuccess('Skill deleted successfully!');
       fetchSkills();
     } catch (err: any) {

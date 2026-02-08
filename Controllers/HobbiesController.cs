@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyPortfolio.Data;
@@ -9,50 +8,39 @@ namespace MyPortfolio.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class HobbiesController : ControllerBase
+    public class HobbiesController : CrudControllerBase<Hobby>
     {
         private readonly ApplicationDbContext _db;
-        private readonly INotificationService _notifications;
 
         public HobbiesController(ApplicationDbContext db, INotificationService notifications)
+            : base(notifications)
         {
             _db = db;
-            _notifications = notifications;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        protected override string EntityName => "hobbies";
+
+        protected override async Task<IEnumerable<Hobby>> GetAllItemsAsync()
         {
-            var items = await _db.Hobbies.OrderBy(i => i.DisplayOrder).ToListAsync();
-            return Ok(items);
+            return await _db.Hobbies.OrderBy(i => i.DisplayOrder).ToListAsync();
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        protected override async Task<Hobby?> GetItemByIdAsync(int id)
         {
-            var item = await _db.Hobbies.FindAsync(id);
-            if (item == null) return NotFound();
-            return Ok(item);
+            return await _db.Hobbies.FindAsync(id);
         }
 
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> Create([FromBody] Hobby model)
+        protected override async Task<int> AddItemAsync(Hobby item)
         {
-            await _db.Hobbies.AddAsync(model);
+            await _db.Hobbies.AddAsync(item);
             await _db.SaveChangesAsync();
-
-            await _notifications.SendEntityChangedAsync("hobbies", "create", model);
-
-            return CreatedAtAction(nameof(Get), new { id = model.Id }, model);
+            return item.Id;
         }
 
-        [HttpPut("{id}")]
-        [Authorize]
-        public async Task<IActionResult> Update(int id, [FromBody] Hobby updated)
+        protected override async Task<bool> UpdateItemAsync(int id, Hobby updated)
         {
             var existing = await _db.Hobbies.FindAsync(id);
-            if (existing == null) return NotFound();
+            if (existing == null) return false;
 
             existing.Name = updated.Name ?? existing.Name;
             existing.Icon = updated.Icon ?? existing.Icon;
@@ -61,25 +49,17 @@ namespace MyPortfolio.Controllers
 
             _db.Hobbies.Update(existing);
             await _db.SaveChangesAsync();
-
-            await _notifications.SendEntityChangedAsync("hobbies", "update", existing);
-
-            return NoContent();
+            return true;
         }
 
-        [HttpDelete("{id}")]
-        [Authorize]
-        public async Task<IActionResult> Delete(int id)
+        protected override async Task<bool> DeleteItemAsync(int id)
         {
             var existing = await _db.Hobbies.FindAsync(id);
-            if (existing == null) return NotFound();
+            if (existing == null) return false;
 
             _db.Hobbies.Remove(existing);
             await _db.SaveChangesAsync();
-
-            await _notifications.SendEntityChangedAsync("hobbies", "delete", new { id });
-
-            return NoContent();
+            return true;
         }
     }
 }

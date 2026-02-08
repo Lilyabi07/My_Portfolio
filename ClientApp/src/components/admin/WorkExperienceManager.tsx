@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api';
 import './WorkExperienceManager.css';
 
 interface WorkExperience {
@@ -34,6 +34,9 @@ function WorkExperienceManager() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const authConfig = {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
+  };
 
   useEffect(() => {
     fetchExperiences();
@@ -42,7 +45,7 @@ function WorkExperienceManager() {
   const fetchExperiences = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/work-experience');
+      const response = await api.get('/work-experience');
       setExperiences(response.data);
     } catch (err: any) {
       setError('Failed to load experiences');
@@ -58,14 +61,10 @@ function WorkExperienceManager() {
 
     try {
       if (editingId) {
-        await axios.put(`/api/work-experience/${editingId}`, formData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await api.put(`/work-experience/${editingId}`, formData, authConfig);
         setSuccess('Experience updated successfully!');
       } else {
-        await axios.post('/api/work-experience', formData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await api.post('/work-experience', formData, authConfig);
         setSuccess('Experience added successfully!');
       }
       resetForm();
@@ -79,9 +78,7 @@ function WorkExperienceManager() {
     if (!window.confirm('Are you sure?')) return;
 
     try {
-      await axios.delete(`/api/work-experience/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      await api.delete(`/work-experience/${id}`, authConfig);
       setSuccess('Experience deleted successfully!');
       fetchExperiences();
     } catch (err: any) {

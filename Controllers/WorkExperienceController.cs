@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyPortfolio.Data;
@@ -9,50 +8,39 @@ namespace MyPortfolio.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class WorkExperienceController : ControllerBase
+    public class WorkExperienceController : CrudControllerBase<WorkExperience>
     {
         private readonly ApplicationDbContext _db;
-        private readonly INotificationService _notifications;
 
         public WorkExperienceController(ApplicationDbContext db, INotificationService notifications)
+            : base(notifications)
         {
             _db = db;
-            _notifications = notifications;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        protected override string EntityName => "work-experience";
+
+        protected override async Task<IEnumerable<WorkExperience>> GetAllItemsAsync()
         {
-            var items = await _db.WorkExperiences.OrderBy(e => e.DisplayOrder).ToListAsync();
-            return Ok(items);
+            return await _db.WorkExperiences.OrderBy(e => e.DisplayOrder).ToListAsync();
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        protected override async Task<WorkExperience?> GetItemByIdAsync(int id)
         {
-            var item = await _db.WorkExperiences.FindAsync(id);
-            if (item == null) return NotFound();
-            return Ok(item);
+            return await _db.WorkExperiences.FindAsync(id);
         }
 
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> Create([FromBody] WorkExperience model)
+        protected override async Task<int> AddItemAsync(WorkExperience item)
         {
-            await _db.WorkExperiences.AddAsync(model);
+            await _db.WorkExperiences.AddAsync(item);
             await _db.SaveChangesAsync();
-
-            await _notifications.SendEntityChangedAsync("work-experience", "create", model);
-
-            return CreatedAtAction(nameof(Get), new { id = model.Id }, model);
+            return item.Id;
         }
 
-        [HttpPut("{id}")]
-        [Authorize]
-        public async Task<IActionResult> Update(int id, [FromBody] WorkExperience updated)
+        protected override async Task<bool> UpdateItemAsync(int id, WorkExperience updated)
         {
             var existing = await _db.WorkExperiences.FindAsync(id);
-            if (existing == null) return NotFound();
+            if (existing == null) return false;
 
             existing.Company = updated.Company ?? existing.Company;
             existing.Position = updated.Position ?? existing.Position;
@@ -64,25 +52,17 @@ namespace MyPortfolio.Controllers
 
             _db.WorkExperiences.Update(existing);
             await _db.SaveChangesAsync();
-
-            await _notifications.SendEntityChangedAsync("work-experience", "update", existing);
-
-            return NoContent();
+            return true;
         }
 
-        [HttpDelete("{id}")]
-        [Authorize]
-        public async Task<IActionResult> Delete(int id)
+        protected override async Task<bool> DeleteItemAsync(int id)
         {
             var existing = await _db.WorkExperiences.FindAsync(id);
-            if (existing == null) return NotFound();
+            if (existing == null) return false;
 
             _db.WorkExperiences.Remove(existing);
             await _db.SaveChangesAsync();
-
-            await _notifications.SendEntityChangedAsync("work-experience", "delete", new { id });
-
-            return NoContent();
+            return true;
         }
     }
 }

@@ -13,11 +13,19 @@ namespace MyPortfolio.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly INotificationService _notifications;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<ContactController> _logger;
+        private readonly IEmailService _emailService;
+        private readonly IProfanityFilterService _profanityFilter;
 
-        public ContactController(ApplicationDbContext db, INotificationService notifications)
+        public ContactController(ApplicationDbContext db, INotificationService notifications, IConfiguration configuration, ILogger<ContactController> logger, IEmailService emailService, IProfanityFilterService profanityFilter)
         {
             _db = db;
             _notifications = notifications;
+            _configuration = configuration;
+            _logger = logger;
+            _emailService = emailService;
+            _profanityFilter = profanityFilter;
         }
 
         [HttpGet]
@@ -81,6 +89,40 @@ namespace MyPortfolio.Controllers
             await _notifications.SendEntityChangedAsync("contact", "delete", new { id });
 
             return NoContent();
+        }
+
+        [HttpPost("send")]
+        public async Task<IActionResult> SendContactMessage([FromBody] ContactMessage message)
+        {
+            if (message == null || string.IsNullOrWhiteSpace(message.Name) || 
+                string.IsNullOrWhiteSpace(message.Email) || string.IsNullOrWhiteSpace(message.Message))
+            {
+                return BadRequest(new { message = "All fields are required." });
+            }
+
+            // Check for profanity in message and name
+            var combinedText = $"{message.Name} {message.Message}";
+            var profanityCheck = _profanityFilter.CheckProfanity(combinedText);
+
+            if (profanityCheck.HasProfanity)
+            {
+                var flaggedWords = string.Join(", ", profanityCheck.Words);
+                _logger.LogWarning($"Contact form submission blocked due to profanity. Words: {flaggedWords}");
+                return BadRequest(new { message = $"Please maintain professional language. Avoid using: {flaggedWords}" });
+            }
+
+            try
+            {
+                await _emailService.SendContactEmailAsync(message.Name, message.Email, message.Message);
+                _logger.LogInformation($"Contact form submission processed - Name: {message.Name}, Email: {message.Email}");
+
+                return Ok(new { success = true, message = "Message sent successfully!" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing contact form");
+                return StatusCode(500, new { message = "Failed to send message. Please try again later." });
+            }
         }
     }
 }

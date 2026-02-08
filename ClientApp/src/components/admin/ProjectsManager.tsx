@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api';
 import './ProjectsManager.css';
 
 interface Project {
@@ -32,6 +32,9 @@ function ProjectsManager() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const authConfig = {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
+  };
 
   useEffect(() => {
     fetchProjects();
@@ -40,7 +43,7 @@ function ProjectsManager() {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/projects');
+      const response = await api.get('/projects');
       setProjects(response.data);
     } catch (err: any) {
       setError('Failed to load projects');
@@ -56,14 +59,10 @@ function ProjectsManager() {
 
     try {
       if (editingId) {
-        await axios.put(`/api/projects/${editingId}`, formData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await api.put(`/projects/${editingId}`, formData, authConfig);
         setSuccess('Project updated successfully!');
       } else {
-        await axios.post('/api/projects', formData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await api.post('/projects', formData, authConfig);
         setSuccess('Project added successfully!');
       }
       resetForm();
@@ -77,9 +76,7 @@ function ProjectsManager() {
     if (!window.confirm('Are you sure?')) return;
 
     try {
-      await axios.delete(`/api/projects/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      await api.delete(`/projects/${id}`, authConfig);
       setSuccess('Project deleted successfully!');
       fetchProjects();
     } catch (err: any) {

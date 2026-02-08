@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 interface Skill {
   id: number;
@@ -23,8 +23,8 @@ const Portfolio: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const skillsResponse = await axios.get('/api/portfolio/skills');
-        const projectsResponse = await axios.get('/api/portfolio/projects');
+        const skillsResponse = await api.get('/portfolio/skills');
+        const projectsResponse = await api.get('/portfolio/projects');
         setSkills(skillsResponse.data);
         setProjects(projectsResponse.data);
         setLoading(false);

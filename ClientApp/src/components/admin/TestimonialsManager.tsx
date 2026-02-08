@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api';
 import './TestimonialsManager.css';
 
 interface Testimonial {
@@ -29,6 +29,9 @@ function TestimonialsManager() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const authConfig = {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
+  };
 
   useEffect(() => {
     fetchTestimonials();
@@ -37,9 +40,7 @@ function TestimonialsManager() {
   const fetchTestimonials = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/testimonials/admin/all', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      const response = await api.get('/testimonials/admin/all', authConfig);
       setTestimonials(response.data);
     } catch (err: any) {
       setError('Failed to load testimonials');
@@ -55,14 +56,10 @@ function TestimonialsManager() {
 
     try {
       if (editingId) {
-        await axios.put(`/api/testimonials/${editingId}`, formData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await api.put(`/testimonials/${editingId}`, formData, authConfig);
         setSuccess('Testimonial updated successfully!');
       } else {
-        await axios.post('/api/testimonials', formData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await api.post('/testimonials', formData, authConfig);
         setSuccess('Testimonial added successfully!');
       }
       resetForm();
@@ -74,9 +71,7 @@ function TestimonialsManager() {
 
   const handlePublish = async (id: number) => {
     try {
-      await axios.put(`/api/testimonials/${id}/publish`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      await api.put(`/testimonials/${id}/publish`, {}, authConfig);
       setSuccess('Testimonial published!');
       fetchTestimonials();
     } catch (err: any) {
@@ -86,9 +81,7 @@ function TestimonialsManager() {
 
   const handleUnpublish = async (id: number) => {
     try {
-      await axios.put(`/api/testimonials/${id}/unpublish`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      await api.put(`/testimonials/${id}/unpublish`, {}, authConfig);
       setSuccess('Testimonial unpublished!');
       fetchTestimonials();
     } catch (err: any) {
@@ -100,9 +93,7 @@ function TestimonialsManager() {
     if (!window.confirm('Are you sure?')) return;
 
     try {
-      await axios.delete(`/api/testimonials/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      await api.delete(`/testimonials/${id}`, authConfig);
       setSuccess('Testimonial deleted successfully!');
       fetchTestimonials();
     } catch (err: any) {

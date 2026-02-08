@@ -32,6 +32,30 @@ namespace MyPortfolio.Controllers
             return Ok(items);
         }
 
+        [HttpGet("cv-url")]
+        public async Task<IActionResult> GetCvUrl()
+        {
+            try
+            {
+                // Get the most recent resume with a file URL
+                var latestResume = await _db.Resumes
+                    .Where(r => !string.IsNullOrEmpty(r.FileUrl))
+                    .OrderByDescending(r => r.UpdatedAt)
+                    .FirstOrDefaultAsync();
+
+                if (latestResume == null)
+                {
+                    return Ok(new { cvUrl = (string?)null });
+                }
+
+                return Ok(new { cvUrl = latestResume.FileUrl });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { cvUrl = (string?)null });
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {

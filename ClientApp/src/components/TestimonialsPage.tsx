@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import Navigation from './Navigation';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import './TestimonialsPage.css';
 
 interface Testimonial {
@@ -29,6 +31,8 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const navigate = useNavigate();
+  const { theme } = useTheme();
+    const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     title: '',
@@ -45,14 +49,14 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get('/api/testimonials');
+      const response = await api.get('/testimonials');
       if (Array.isArray(response.data)) {
         setTestimonials(response.data);
       } else {
-        setError('Invalid data format received');
+        setError(t('testimonials.invalidData'));
       }
     } catch (err) {
-      setError('Failed to load testimonials. Please try again later.');
+      setError(t('testimonials.loadError'));
       console.error('Error fetching testimonials:', err);
     } finally {
       setLoading(false);
@@ -65,7 +69,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
     setSubmitError(null);
 
     try {
-      await axios.post('/api/testimonials', formData);
+      await api.post('/testimonials', formData);
       setSubmitSuccess(true);
       setFormData({
         name: '',
@@ -106,7 +110,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
   };
 
   return (
-    <div className="testimonials-page">
+    <div className={`testimonials-page theme-${theme}`}>
       <Navigation onAdminClick={onAdminClick} />
       
       {/* Success Notification Popup */}
@@ -129,16 +133,16 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
       )}
       
       <section className="testimonials-hero">
-        <button 
+        {/* <button 
           className="btn-back-testimonials" 
           onClick={() => navigate('/')}
           title="Back to homepage"
         >
           <i className="fas fa-arrow-left"></i> Back to Home
-        </button>
+        </button> */}
         <div className="testimonials-hero-content">
-          <h1>Testimonials</h1>
-          <p>What clients and colleagues have to say about my work</p>
+          <h1>{t('nav.testimonials')}</h1>
+          <p>{t('testimonials.subtitle')}</p>
         </div>
       </section>
 
@@ -149,16 +153,16 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
               className="btn btn-lg btn-success"
               onClick={() => setShowModal(true)}
             >
-              <i className="fas fa-plus"></i> Share Your Testimonial
+              <i className="fas fa-plus"></i> {t('testimonials.addTestimonial')}
             </button>
           </div>
 
           {loading ? (
             <div className="loading">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('common.loading')}</span>
               </div>
-              <p>Loading testimonials...</p>
+              <p>{t('common.loading')}</p>
             </div>
           ) : error ? (
             <div className="alert alert-info" role="alert">
@@ -166,7 +170,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
             </div>
           ) : testimonials.length === 0 ? (
             <div className="alert alert-info" role="alert">
-              No testimonials available at this time. Be the first to share one!
+              {t('testimonials.noTestimonials') || 'No testimonials available at this time. Be the first to share one!'}
             </div>
           ) : (
             <div className="row g-4">
@@ -210,32 +214,31 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="testimonialModalLabel">
-                <i className="fas fa-star"></i> Share Your Testimonial
+                <i className="fas fa-star"></i> {t('testimonials.addTestimonial')}
               </h5>
               <button
                 type="button"
                 className="btn-close"
                 onClick={() => setShowModal(false)}
-                aria-label="Close"
+                aria-label={t('common.close')}
               ></button>
             </div>
             <div className="modal-body">
               {submitSuccess ? (
                 <div className="alert alert-success" role="alert">
-                  <i className="fas fa-check-circle"></i> Thank you! Your testimonial has been submitted successfully.
-                  It will appear on the site once reviewed and approved by the admin.
+                  <i className="fas fa-check-circle"></i> {t('testimonials.success')}
                 </div>
               ) : (
                 <>
                   {submitError && (
                     <div className="alert alert-danger" role="alert">
-                      <i className="fas fa-exclamation-circle"></i> {submitError}
+                      <i className="fas fa-exclamation-circle"></i> {submitError || t('testimonials.error')}
                     </div>
                   )}
                   <form onSubmit={handleSubmit}>
                   <div className="mb-3">
                     <label htmlFor="name" className="form-label">
-                      Your Name <span className="text-danger">*</span>
+                      {t('testimonials.name')} <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
@@ -244,14 +247,14 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
-                      placeholder="e.g., John Doe"
+                      placeholder={t('contact.placeholders.name')}
                     />
                   </div>
 
                   <div className="row">
                     <div className="col-md-6 mb-3">
                       <label htmlFor="title" className="form-label">
-                        Your Title <span className="text-danger">*</span>
+                        {t('testimonials.title')} <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
@@ -260,12 +263,12 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         required
-                        placeholder="e.g., Project Manager"
+                        placeholder={t('testimonials.title')}
                       />
                     </div>
                     <div className="col-md-6 mb-3">
                       <label htmlFor="company" className="form-label">
-                        Company <span className="text-danger">*</span>
+                        {t('testimonials.company')} <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
@@ -274,14 +277,14 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                         required
-                        placeholder="e.g., Tech Company Inc."
+                        placeholder={t('testimonials.company')}
                       />
                     </div>
                   </div>
 
                   <div className="mb-3">
                     <label htmlFor="message" className="form-label">
-                      Your Testimonial <span className="text-danger">*</span>
+                      {t('testimonials.message')} <span className="text-danger">*</span>
                     </label>
                     <textarea
                       className="form-control"
@@ -290,13 +293,13 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       rows={4}
                       required
-                      placeholder="Share your experience working with me..."
+                      placeholder={t('contact.placeholders.message')}
                     />
                   </div>
 
                   <div className="mb-3">
                     <label htmlFor="rating" className="form-label">
-                      Rating <span className="text-danger">*</span>
+                      {t('testimonials.rating')} <span className="text-danger">*</span>
                     </label>
                     <select
                       className="form-select"
@@ -304,11 +307,11 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                       value={formData.rating}
                       onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) })}
                     >
-                      <option value={5}>Excellent (5)</option>
-                      <option value={4}>Very Good (4)</option>
-                      <option value={3}>Good (3)</option>
-                      <option value={2}>Fair (2)</option>
-                      <option value={1}>Poor (1)</option>
+                      <option value={5}>★★★★★ (5)</option>
+                      <option value={4}>★★★★☆ (4)</option>
+                      <option value={3}>★★★☆☆ (3)</option>
+                      <option value={2}>★★☆☆☆ (2)</option>
+                      <option value={1}>★☆☆☆☆ (1)</option>
                     </select>
                   </div>
 
@@ -318,7 +321,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                       className="btn btn-secondary"
                       onClick={() => setShowModal(false)}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                     <button
                       type="submit"
@@ -328,11 +331,12 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                       {submitting ? (
                         <>
                           <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                          Submitting...
+                          {t('common.loading')}
                         </>
                       ) : (
                         <>
                           <i className="fas fa-paper-plane"></i> Submit Testimonial
+                                                  <i className="fas fa-paper-plane"></i> {t('testimonials.submit')}
                         </>
                       )}
                     </button>

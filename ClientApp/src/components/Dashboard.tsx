@@ -3,6 +3,8 @@ import SkillsManager from './admin/SkillsManager';
 import ProjectsManager from './admin/ProjectsManager';
 import WorkExperienceManager from './admin/WorkExperienceManager';
 import TestimonialsManager from './admin/TestimonialsManager';
+import ResumeManager from './admin/ResumeManager';
+import { useLanguage } from '../contexts/LanguageContext';
 import './Dashboard.css';
 
 interface DashboardProps {
@@ -10,10 +12,11 @@ interface DashboardProps {
   onLogout: () => void;
 }
 
-type AdminTab = 'skills' | 'projects' | 'experience' | 'testimonials';
+type AdminTab = 'skills' | 'projects' | 'experience' | 'resume' | 'testimonials';
 
 function Dashboard({ adminUsername, onLogout }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<AdminTab>('skills');
+  const { t } = useLanguage();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -26,12 +29,12 @@ function Dashboard({ adminUsername, onLogout }: DashboardProps) {
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container-fluid">
           <span className="navbar-brand">
-            <i className="fas fa-cube"></i> Portfolio Admin
+            <i className="fas fa-cube"></i> {t('admin.title')}
           </span>
           <div className="navbar-text text-white">
-            <span className="me-3">Welcome, {adminUsername}!</span>
+            <span className="me-3">{t('admin.welcome')} {adminUsername}!</span>
             <button className="btn btn-sm btn-danger" onClick={handleLogout}>
-              <i className="fas fa-sign-out-alt"></i> Logout
+              <i className="fas fa-sign-out-alt"></i> {t('nav.logout')}
             </button>
           </div>
         </div>
@@ -45,25 +48,31 @@ function Dashboard({ adminUsername, onLogout }: DashboardProps) {
                 className={`nav-link ${activeTab === 'skills' ? 'active' : ''}`}
                 onClick={() => setActiveTab('skills')}
               >
-                <i className="fas fa-star"></i> Skills
+                <i className="fas fa-star"></i> {t('admin.tabs.skills')}
               </button>
               <button
                 className={`nav-link ${activeTab === 'projects' ? 'active' : ''}`}
                 onClick={() => setActiveTab('projects')}
               >
-                <i className="fas fa-folder"></i> Projects
+                <i className="fas fa-folder"></i> {t('admin.tabs.projects')}
               </button>
               <button
                 className={`nav-link ${activeTab === 'experience' ? 'active' : ''}`}
                 onClick={() => setActiveTab('experience')}
               >
-                <i className="fas fa-briefcase"></i> Experience
+                <i className="fas fa-briefcase"></i> {t('admin.tabs.experience')}
+              </button>
+              <button
+                className={`nav-link ${activeTab === 'resume' ? 'active' : ''}`}
+                onClick={() => setActiveTab('resume')}
+              >
+                <i className="fas fa-file-pdf"></i> {t('admin.tabs.resume')}
               </button>
               <button
                 className={`nav-link ${activeTab === 'testimonials' ? 'active' : ''}`}
                 onClick={() => setActiveTab('testimonials')}
               >
-                <i className="fas fa-comments"></i> Testimonials
+                <i className="fas fa-comments"></i> {t('admin.tabs.testimonials')}
               </button>
             </div>
           </div>
@@ -73,6 +82,7 @@ function Dashboard({ adminUsername, onLogout }: DashboardProps) {
               {activeTab === 'skills' && <SkillsManager />}
               {activeTab === 'projects' && <ProjectsManager />}
               {activeTab === 'experience' && <WorkExperienceManager />}
+              {activeTab === 'resume' && <ResumeManager />}
               {activeTab === 'testimonials' && <TestimonialsManager />}
             </div>
           </div>
