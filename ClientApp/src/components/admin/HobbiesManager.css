@@ -1,0 +1,293 @@
+.hobbies-manager {
+  padding: 20px;
+}
+
+.hobbies-manager h2 {
+  margin-bottom: 30px;
+  color: var(--text-color);
+}
+
+.hobbies-manager h4 {
+  color: #f5f5f5;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.hobbies-manager .form-control,
+.hobbies-manager .form-check-input {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.hobbies-manager .form-control:focus {
+  border-color: #2a6ee6;
+  box-shadow: 0 0 0 0.2rem rgba(42, 110, 230, 0.25);
+  background: var(--input-bg);
+  color: var(--text-color);
+}
+
+.hobbies-manager .form-label {
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.hobbies-form {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.hobbies-form h4 {
+  color: var(--text-color);
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* Icon Selector */
+.icon-selector {
+  margin-bottom: 15px;
+}
+
+.icon-preview {
+  padding: 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-color);
+  min-height: 40px;
+}
+
+.icon-preview i {
+  font-size: 1.5rem;
+  color: #2a6ee6;
+}
+
+.icon-suggestions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: 8px;
+  padding: 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: #2a6ee6;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: #2a6ee6;
+  color: white;
+  transform: scale(1.1);
+}
+
+.hobbies-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hobby-item {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.hobby-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hobby-info {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex: 1;
+}
+
+.hobby-icon-display {
+  font-size: 2rem;
+  color: #2a6ee6;
+  min-width: 50px;
+  text-align: center;
+}
+
+.hobby-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hobby-details strong {
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.hobby-details small {
+  color: rgba(184, 212, 241, 0.8);
+  line-height: 1.4;
+}
+
+.hobby-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 10px;
+}
+
+.hobby-actions .btn {
+  padding: 5px 10px;
+  font-size: 0.875rem;
+}
+
+.alert {
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Light Theme */
+.theme-light .hobbies-manager {
+  background: #f5f5f5;
+}
+
+.theme-light .hobbies-form {
+  background: #ffffff;
+  border-color: #d0e1f9;
+}
+
+.theme-light .hobby-item {
+  background: #f8f9fa;
+  border-color: #d0e1f9;
+}
+
+.theme-light .hobbies-manager .form-control {
+  background: #ffffff;
+  border-color: #d0e1f9;
+  color: #2c3e50;
+}
+
+.theme-light .hobbies-manager .form-control::placeholder {
+  color: #7a8c9e;
+}
+
+.theme-light .hobbies-manager .form-label {
+  color: #8296ab;
+}
+
+.theme-light .icon-preview {
+  background: #ffffff;
+  border-color: #d0e1f9;
+}
+
+.theme-light .icon-suggestions {
+  background: #ffffff;
+  border-color: #d0e1f9;
+}
+
+.theme-light .icon-btn {
+  border-color: #d0e1f9;
+}
+
+.theme-light .icon-btn:hover {
+  background: #2a6ee6;
+  border-color: #2a6ee6;
+  color: white;
+}
+
+.theme-light .hobby-details small {
+  color: #5a6c7d;
+}
+
+.theme-light .hobbies-manager h4 {
+  color: #171d22;
+}
+
+/* Dark Theme */
+.theme-dark .hobbies-manager {
+  background: #0a1929;
+}
+
+.theme-dark .hobbies-form {
+  background: #1e3a5f;
+  border-color: #2a6ee6;
+}
+
+.theme-dark .hobby-item {
+  background: #0f2744;
+  border-color: #2a6ee6;
+}
+
+.theme-dark .hobbies-manager .form-control {
+  background: #0f2744;
+  border-color: #2a6ee6;
+  color: #f5f5f5;
+}
+
+.theme-dark .hobbies-manager .form-control::placeholder {
+  color: rgba(184, 212, 241, 0.5);
+}
+
+.theme-dark .hobbies-manager .form-label {
+  color: #f5f5f5;
+}
+
+.theme-dark .icon-preview {
+  background: #0f2744;
+  border-color: #2a6ee6;
+}
+
+.theme-dark .icon-suggestions {
+  background: #0f2744;
+  border-color: #2a6ee6;
+}
+
+.theme-dark .icon-btn {
+  border-color: #2a6ee6;
+}
+
+.theme-dark .icon-btn:hover {
+  background: #2a6ee6;
+  border-color: #2a6ee6;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hobbies-manager .row {
+    flex-direction: column;
+  }
+
+  .hobby-item {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .hobby-actions {
+    margin-left: 0;
+    align-self: flex-start;
+  }
+
+  .icon-suggestions {
+    grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
+  }
+}
