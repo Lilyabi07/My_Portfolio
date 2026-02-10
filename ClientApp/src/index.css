@@ -1,0 +1,16 @@
+body {
+  margin: 0;
+  font-family: 'Courier New', Courier, monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Serif font for small sections - using web-safe alternatives */
+p, span, li, td, th {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
