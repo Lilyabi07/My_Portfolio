@@ -13,11 +13,15 @@ namespace MyPortfolio.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly INotificationService _notifications;
+        private readonly IRateLimitService _rateLimitService;
+        private readonly ILogger<TestimonialsController> _logger;
 
-        public TestimonialsController(ApplicationDbContext db, INotificationService notifications)
+        public TestimonialsController(ApplicationDbContext db, INotificationService notifications, IRateLimitService rateLimitService, ILogger<TestimonialsController> logger)
         {
             _db = db;
             _notifications = notifications;
+            _rateLimitService = rateLimitService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -61,6 +65,30 @@ namespace MyPortfolio.Controllers
             if (testimonial == null || string.IsNullOrWhiteSpace(testimonial.Name) || string.IsNullOrWhiteSpace(testimonial.Message))
                 return BadRequest("Name and Message are required");
 
+            // Get client IP for rate limiting
+            var clientIp = RateLimitService.GetClientIdentifier(HttpContext);
+
+            // Rate limit: 3 testimonials per IP per 24 hours
+            var rateLimitResult = await _rateLimitService.CheckRateLimitAsync(
+                clientIp,
+                "testimonial_submit",
+                TimeSpan.FromHours(24),
+                3);
+
+            if (!rateLimitResult.allowed)
+            {
+                var retrySeconds = (int)rateLimitResult.retryAfter.TotalSeconds;
+                var retryHours = retrySeconds / 3600;
+                var retryMinutes = (retrySeconds % 3600) / 60;
+                
+                _logger.LogWarning($"Testimonial submission rate limit exceeded for IP: {clientIp}. Retry after: {retrySeconds}s");
+                return StatusCode(429, new
+                {
+                    message = $"Too many testimonial submissions. Please try again in {retryHours}h {retryMinutes}m.",
+                    retryAfter = retrySeconds
+                });
+            }
+
             testimonial.IsPublished = false; // New testimonials are pending approval
             testimonial.SubmittedDate = DateTime.UtcNow;
 
@@ -69,7 +97,14 @@ namespace MyPortfolio.Controllers
 
             await _notifications.SendEntityChangedAsync("testimonials", "create", testimonial);
 
-            return CreatedAtAction(nameof(GetTestimonial), new { id = testimonial.Id }, testimonial);
+            _logger.LogInformation($"New testimonial submitted from {testimonial.Name} (IP: {clientIp}). Pending approval.");
+
+            return CreatedAtAction(nameof(GetTestimonial), new { id = testimonial.Id }, new 
+            { 
+                id = testimonial.Id,
+                message = "Thank you for your testimonial! It will be reviewed and published shortly.",
+                remaining = rateLimitResult.remaining
+            });
         }
 
         [HttpPut("{id}")]

@@ -1,12 +1,13 @@
 .skills-manager h2 {
   margin-bottom: 2rem;
-  color: #333;
+  color: #f5f5f5;
 }
 
 .skill-form {
-  background-color: #f8f9fa;
+  background-color: var(--card-bg);
   padding: 1.5rem;
   border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
 }
 
 .skill-item {
@@ -14,7 +15,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-color);
 }
 
 .skill-item:last-child {
@@ -40,7 +43,13 @@
 }
 
 .skills-list {
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   overflow: hidden;
+  background: var(--card-bg);
+}
+
+/* Light Mode Overrides */
+.theme-light .skills-manager h2 {
+  color: #2c3e50;
 }

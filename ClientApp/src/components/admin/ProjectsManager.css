@@ -1,12 +1,13 @@
 .projects-manager h2 {
   margin-bottom: 2rem;
-  color: #333;
+  color: #f5f5f5;
 }
 
 .project-form {
-  background-color: #f8f9fa;
+  background-color: var(--card-bg);
   padding: 1.5rem;
   border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
 }
 
 .projects-list {
@@ -16,10 +17,11 @@
 }
 
 .project-card {
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   overflow: hidden;
-  background-color: #fff;
+  background-color: var(--card-bg);
+  color: var(--text-color);
 }
 
 .project-image {
@@ -40,4 +42,9 @@
   display: flex;
   gap: 0.5rem;
   margin-top: 0.75rem;
+}
+
+/* Light Mode Overrides */
+.theme-light .projects-manager h2 {
+  color: #2c3e50;
 }

@@ -335,8 +335,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                         </>
                       ) : (
                         <>
-                          <i className="fas fa-paper-plane"></i> Submit Testimonial
-                                                  <i className="fas fa-paper-plane"></i> {t('testimonials.submit')}
+                          <i className="fas fa-paper-plane"></i> {t('testimonials.submit')}
                         </>
                       )}
                     </button>

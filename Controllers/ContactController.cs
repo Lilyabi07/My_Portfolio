@@ -17,8 +17,9 @@ namespace MyPortfolio.Controllers
         private readonly ILogger<ContactController> _logger;
         private readonly IEmailService _emailService;
         private readonly IProfanityFilterService _profanityFilter;
+        private readonly IRateLimitService _rateLimitService;
 
-        public ContactController(ApplicationDbContext db, INotificationService notifications, IConfiguration configuration, ILogger<ContactController> logger, IEmailService emailService, IProfanityFilterService profanityFilter)
+        public ContactController(ApplicationDbContext db, INotificationService notifications, IConfiguration configuration, ILogger<ContactController> logger, IEmailService emailService, IProfanityFilterService profanityFilter, IRateLimitService rateLimitService)
         {
             _db = db;
             _notifications = notifications;
@@ -26,6 +27,7 @@ namespace MyPortfolio.Controllers
             _logger = logger;
             _emailService = emailService;
             _profanityFilter = profanityFilter;
+            _rateLimitService = rateLimitService;
         }
 
         [HttpGet]
@@ -35,12 +37,51 @@ namespace MyPortfolio.Controllers
             return Ok(items);
         }
 
+        [HttpGet("messages")]
+        [Authorize]
+        public async Task<IActionResult> GetAllMessages()
+        {
+            var messages = await _db.ContactMessages.OrderByDescending(m => m.SubmittedAt).ToListAsync();
+            return Ok(messages);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var item = await _db.ContactInformation.FindAsync(id);
             if (item == null) return NotFound();
             return Ok(item);
+        }
+
+        [HttpPut("messages/{id}/mark-read")]
+        [Authorize]
+        public async Task<IActionResult> MarkMessageAsRead(int id)
+        {
+            var message = await _db.ContactMessages.FindAsync(id);
+            if (message == null) return NotFound();
+
+            if (!message.IsRead)
+            {
+                message.IsRead = true;
+                message.ReadAt = DateTime.UtcNow;
+                _db.ContactMessages.Update(message);
+                await _db.SaveChangesAsync();
+            }
+
+            return Ok(message);
+        }
+
+        [HttpDelete("messages/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteMessage(int id)
+        {
+            var message = await _db.ContactMessages.FindAsync(id);
+            if (message == null) return NotFound();
+
+            _db.ContactMessages.Remove(message);
+            await _db.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [HttpPost]
@@ -100,6 +141,26 @@ namespace MyPortfolio.Controllers
                 return BadRequest(new { message = "All fields are required." });
             }
 
+            // Get client IP for rate limiting
+            var clientIp = RateLimitService.GetClientIdentifier(HttpContext);
+
+            // Rate limit: 5 messages per IP per 1 hour
+            var rateLimitResult = await _rateLimitService.CheckRateLimitAsync(
+                clientIp, 
+                "contact_form", 
+                TimeSpan.FromHours(1), 
+                5);
+
+            if (!rateLimitResult.allowed)
+            {
+                var retrySeconds = (int)rateLimitResult.retryAfter.TotalSeconds;
+                _logger.LogWarning($"Contact form rate limit exceeded for IP: {clientIp}. Retry after: {retrySeconds}s");
+                return StatusCode(429, new { 
+                    message = $"Too many messages. Please try again in {retrySeconds} seconds.",
+                    retryAfter = retrySeconds
+                });
+            }
+
             // Check for profanity in message and name
             var combinedText = $"{message.Name} {message.Message}";
             var profanityCheck = _profanityFilter.CheckProfanity(combinedText);
@@ -113,10 +174,20 @@ namespace MyPortfolio.Controllers
 
             try
             {
-                await _emailService.SendContactEmailAsync(message.Name, message.Email, message.Message);
-                _logger.LogInformation($"Contact form submission processed - Name: {message.Name}, Email: {message.Email}");
+                // Save message to database
+                message.SubmittedAt = DateTime.UtcNow;
+                await _db.ContactMessages.AddAsync(message);
+                await _db.SaveChangesAsync();
 
-                return Ok(new { success = true, message = "Message sent successfully!" });
+                // Send email notification to admin
+                await _emailService.SendContactEmailAsync(message.Name, message.Email, message.Message);
+                _logger.LogInformation($"Contact form submission processed - Name: {message.Name}, Email: {message.Email}, IP: {clientIp}");
+
+                return Ok(new { 
+                    success = true, 
+                    message = "Message sent successfully!",
+                    remaining = rateLimitResult.remaining
+                });
             }
             catch (Exception ex)
             {

@@ -246,7 +246,7 @@ function ResumeManager() {
                           <div>
                             <h6 className="mb-1">
                               <i className="fas fa-file-pdf text-danger me-2"></i>
-                              CV #{resume.id}
+                              Bianca B. - CV
                             </h6>
                             <small className="text-muted">
                               <i className="fas fa-clock me-1"></i>
@@ -254,23 +254,33 @@ function ResumeManager() {
                             </small>
                           </div>
                           <div className="resume-actions">
-                            <a
-                              href={resume.fileUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
                               className="btn btn-sm btn-info me-1"
                               title="View CV"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                // Open in new tab - browser will handle PDF display
+                                window.open(`/api/resume/download/${resume.id}`, '_blank');
+                              }}
                             >
                               <i className="fas fa-eye"></i>
-                            </a>
-                            <a
-                              href={resume.fileUrl}
-                              download
+                            </button>
+                              <button
                               className="btn btn-sm btn-success me-1"
                               title="Download CV"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                // Create download link
+                                const link = document.createElement('a');
+                                link.href = `/api/resume/download/${resume.id}`;
+                                link.download = 'Bianca B. - CV.pdf';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                              }}
                             >
                               <i className="fas fa-download"></i>
-                            </a>
+                            </button>
                             <button
                               className="btn btn-sm btn-warning me-1"
                               onClick={() => handleEdit(resume)}

@@ -7,7 +7,7 @@ using MyPortfolio.Services;
 namespace MyPortfolio.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/work-experience")]
     public class WorkExperienceController : CrudControllerBase<WorkExperience>
     {
         private readonly ApplicationDbContext _db;

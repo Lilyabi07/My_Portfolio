@@ -27,6 +27,9 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // Register ProfanityFilterService
 builder.Services.AddScoped<IProfanityFilterService, ProfanityFilterService>();
 
+// Register RateLimitService (singleton for in-memory rate limiting)
+builder.Services.AddSingleton<IRateLimitService, RateLimitService>();
+
 // CORS: explicitly allow the React dev server origins and enable preflight/credentials if needed
 var allowedOrigins = new[] { "http://localhost:3000", "https://localhost:3000" };
 builder.Services.AddCors(options =>
@@ -77,7 +80,11 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Serve static files from wwwroot (including uploads)
 app.UseStaticFiles();
+
+// Serve SPA static files
 app.UseSpaStaticFiles();
 
 // Use CORS before endpoints that serve API
@@ -99,8 +106,11 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Configure SPA - but DON'T proxy API routes
-app.MapWhen(context => !context.Request.Path.StartsWithSegments("/api"), spaApp =>
+// Configure SPA - but DON'T proxy API routes or static file uploads
+app.MapWhen(context => 
+    !context.Request.Path.StartsWithSegments("/api") && 
+    !context.Request.Path.StartsWithSegments("/uploads"), 
+    spaApp =>
 {
     spaApp.UseSpa(spa =>
     {

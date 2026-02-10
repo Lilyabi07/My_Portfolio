@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './WorkExperienceManager.css';
 
 interface WorkExperience {
   id: number;
-  companyEn: string;
-  companyEs: string;
-  positionEn: string;
-  positionEs: string;
-  descriptionEn: string;
-  descriptionEs: string;
+  company: string;
+  position: string;
+  description: string;
   startDate: string;
   endDate: string;
   isCurrent: boolean;
@@ -21,12 +19,9 @@ function WorkExperienceManager() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<Omit<WorkExperience, 'id'>>({
-    companyEn: '',
-    companyEs: '',
-    positionEn: '',
-    positionEs: '',
-    descriptionEn: '',
-    descriptionEs: '',
+    company: '',
+    position: '',
+    description: '',
     startDate: '',
     endDate: '',
     isCurrent: false,
@@ -34,6 +29,7 @@ function WorkExperienceManager() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const { t } = useLanguage();
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
   };
@@ -89,12 +85,9 @@ function WorkExperienceManager() {
   const handleEdit = (exp: WorkExperience) => {
     setEditingId(exp.id);
     setFormData({
-      companyEn: exp.companyEn,
-      companyEs: exp.companyEs,
-      positionEn: exp.positionEn,
-      positionEs: exp.positionEs,
-      descriptionEn: exp.descriptionEn,
-      descriptionEs: exp.descriptionEs,
+      company: exp.company,
+      position: exp.position,
+      description: exp.description,
       startDate: exp.startDate,
       endDate: exp.endDate,
       isCurrent: exp.isCurrent,
@@ -105,12 +98,9 @@ function WorkExperienceManager() {
   const resetForm = () => {
     setEditingId(null);
     setFormData({
-      companyEn: '',
-      companyEs: '',
-      positionEn: '',
-      positionEs: '',
-      descriptionEn: '',
-      descriptionEs: '',
+      company: '',
+      position: '',
+      description: '',
       startDate: '',
       endDate: '',
       isCurrent: false,
@@ -137,61 +127,29 @@ function WorkExperienceManager() {
               <input
                 type="text"
                 className="form-control"
-                value={formData.companyEn}
-                onChange={(e) => setFormData({ ...formData, companyEn: e.target.value })}
+                value={formData.company}
+                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                 required
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Company (ES)</label>
+              <label className="form-label">Position</label>
               <input
                 type="text"
                 className="form-control"
-                value={formData.companyEs}
-                onChange={(e) => setFormData({ ...formData, companyEs: e.target.value })}
+                value={formData.position}
+                onChange={(e) => setFormData({ ...formData, position: e.target.value })}
                 required
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Position (EN)</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.positionEn}
-                onChange={(e) => setFormData({ ...formData, positionEn: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Position (ES)</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.positionEs}
-                onChange={(e) => setFormData({ ...formData, positionEs: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Description (EN)</label>
+              <label className="form-label">Description</label>
               <textarea
                 className="form-control"
-                value={formData.descriptionEn}
-                onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
-                rows={2}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Description (ES)</label>
-              <textarea
-                className="form-control"
-                value={formData.descriptionEs}
-                onChange={(e) => setFormData({ ...formData, descriptionEs: e.target.value })}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={2}
               />
             </div>

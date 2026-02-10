@@ -13,6 +13,8 @@ import TestimonialsPage from './components/TestimonialsPage';
 import AboutPage from './components/AboutPage';
 import ContactPage from './components/ContactPage';
 import ResumePage from './components/ResumePage';
+import EducationPage from './components/EducationPage';
+import HobbiesPage from './components/HobbiesPage';
 
 function AppContent() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -68,6 +70,8 @@ function AppContent() {
         <Route path="/testimonials" element={<TestimonialsPage onAdminClick={handleAdminClick} />} />
         <Route path="/about" element={<AboutPage onAdminClick={handleAdminClick} />} />
         <Route path="/resume" element={<ResumePage onAdminClick={handleAdminClick} />} />
+        <Route path="/education" element={<EducationPage onAdminClick={handleAdminClick} />} />
+        <Route path="/hobbies" element={<HobbiesPage onAdminClick={handleAdminClick} />} />
         <Route path="/contact" element={<ContactPage onAdminClick={handleAdminClick} />} />
 
         {/* Catch-all redirect */}

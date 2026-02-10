@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import SkillsManager from './admin/SkillsManager';
 import ProjectsManager from './admin/ProjectsManager';
 import WorkExperienceManager from './admin/WorkExperienceManager';
+import EducationManager from './admin/EducationManager';
 import TestimonialsManager from './admin/TestimonialsManager';
 import ResumeManager from './admin/ResumeManager';
+import HobbiesManager from './admin/HobbiesManager';
+import ContactMessagesManager from './admin/ContactMessagesManager';
 import { useLanguage } from '../contexts/LanguageContext';
 import './Dashboard.css';
 
@@ -12,7 +15,7 @@ interface DashboardProps {
   onLogout: () => void;
 }
 
-type AdminTab = 'skills' | 'projects' | 'experience' | 'resume' | 'testimonials';
+type AdminTab = 'skills' | 'projects' | 'experience' | 'education' | 'resume' | 'hobbies' | 'testimonials' | 'messages';
 
 function Dashboard({ adminUsername, onLogout }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<AdminTab>('skills');
@@ -63,16 +66,34 @@ function Dashboard({ adminUsername, onLogout }: DashboardProps) {
                 <i className="fas fa-briefcase"></i> {t('admin.tabs.experience')}
               </button>
               <button
+                className={`nav-link ${activeTab === 'education' ? 'active' : ''}`}
+                onClick={() => setActiveTab('education')}
+              >
+                <i className="fas fa-graduation-cap"></i> {t('admin.tabs.education')}
+              </button>
+              <button
                 className={`nav-link ${activeTab === 'resume' ? 'active' : ''}`}
                 onClick={() => setActiveTab('resume')}
               >
                 <i className="fas fa-file-pdf"></i> {t('admin.tabs.resume')}
               </button>
               <button
+                className={`nav-link ${activeTab === 'hobbies' ? 'active' : ''}`}
+                onClick={() => setActiveTab('hobbies')}
+              >
+                <i className="fas fa-heart"></i> {t('admin.tabs.hobbies')}
+              </button>
+              <button
                 className={`nav-link ${activeTab === 'testimonials' ? 'active' : ''}`}
                 onClick={() => setActiveTab('testimonials')}
               >
                 <i className="fas fa-comments"></i> {t('admin.tabs.testimonials')}
+              </button>
+              <button
+                className={`nav-link ${activeTab === 'messages' ? 'active' : ''}`}
+                onClick={() => setActiveTab('messages')}
+              >
+                <i className="fas fa-envelope"></i> {t('admin.tabs.messages')}
               </button>
             </div>
           </div>
@@ -82,8 +103,11 @@ function Dashboard({ adminUsername, onLogout }: DashboardProps) {
               {activeTab === 'skills' && <SkillsManager />}
               {activeTab === 'projects' && <ProjectsManager />}
               {activeTab === 'experience' && <WorkExperienceManager />}
+              {activeTab === 'education' && <EducationManager />}
               {activeTab === 'resume' && <ResumeManager />}
+              {activeTab === 'hobbies' && <HobbiesManager />}
               {activeTab === 'testimonials' && <TestimonialsManager />}
+              {activeTab === 'messages' && <ContactMessagesManager />}
             </div>
           </div>
         </div>

@@ -10,7 +10,7 @@
 }
 
 .nav-tabs .nav-link {
-  color: #666;
+  color: rgba(184, 212, 241, 0.8);
   border: none;
   border-bottom: 3px solid transparent;
   margin-bottom: -2px;
@@ -87,13 +87,13 @@
 .testimonial-info .meta {
   margin: 0.25rem 0 0 0;
   font-size: 0.85rem;
-  color: #666;
+  color: rgba(184, 212, 241, 0.7);
 }
 
 .testimonial-info .date {
   margin: 0.25rem 0 0 0;
   font-size: 0.75rem;
-  color: #999;
+  color: rgba(184, 212, 241, 0.6);
 }
 
 .stars {
@@ -112,7 +112,7 @@
 }
 
 .message {
-  color: #666;
+  color: rgba(184, 212, 241, 0.9);
   font-style: italic;
   font-size: 0.95rem;
   margin: 1rem 0;
@@ -175,4 +175,21 @@
   .actions .btn {
     width: 100%;
   }
+}
+
+/* Light Mode Overrides */
+.theme-light .nav-tabs .nav-link {
+  color: #5a6c7d;
+}
+
+.theme-light .testimonial-info .meta {
+  color: #5a6c7d;
+}
+
+.theme-light .message {
+  color: #5a6c7d;
+}
+
+.theme-light .testimonial-info .date {
+  color: #7a8c9e;
 }

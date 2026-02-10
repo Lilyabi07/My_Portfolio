@@ -64,6 +64,48 @@ namespace MyPortfolio.Controllers
             return Ok(item);
         }
 
+        [HttpGet("download/{id}")]
+        public async Task<IActionResult> Download(int id)
+        {
+            var resume = await _db.Resumes.FindAsync(id);
+            if (resume == null) return NotFound(new { message = "CV not found" });
+
+            if (string.IsNullOrEmpty(resume.FileUrl))
+                return NotFound(new { message = "No file associated with this CV" });
+
+            // Extract filename from URL
+            var filePath = Path.Combine(_env.WebRootPath ?? "wwwroot", 
+                resume.FileUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound(new { message = "File not found on server" });
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            return File(fileBytes, "application/pdf", "Bianca B. - CV.pdf");
+        }
+
+        [HttpGet("download-latest")]
+        public async Task<IActionResult> DownloadLatest()
+        {
+            var latestResume = await _db.Resumes
+                .Where(r => !string.IsNullOrEmpty(r.FileUrl))
+                .OrderByDescending(r => r.UpdatedAt)
+                .FirstOrDefaultAsync();
+
+            if (latestResume == null)
+                return NotFound(new { message = "No CV available" });
+
+            // Extract filename from URL
+            var filePath = Path.Combine(_env.WebRootPath ?? "wwwroot", 
+                latestResume.FileUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound(new { message = "File not found on server" });
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            return File(fileBytes, "application/pdf", "Bianca B. - CV.pdf");
+        }
+
         // Upload a resume PDF. Returns created Resume record with FileUrl.
         [HttpPost("upload")]
         [Authorize]

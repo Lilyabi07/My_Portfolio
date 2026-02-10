@@ -3,6 +3,7 @@ import api from '../api';
 import Navigation from './Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatMonthYear, sortByDisplayOrder } from '../utils/formatters';
 import './ResumePage.css';
 
 interface WorkExperience {
@@ -39,7 +40,7 @@ function ResumePage({ onAdminClick }: ResumePageProps) {
       setError(null);
       const response = await api.get('/work-experience');
       if (Array.isArray(response.data)) {
-        setExperiences(response.data);
+        setExperiences(sortByDisplayOrder(response.data));
       } else {
         setError(t('resume.invalidData'));
       }
@@ -62,11 +63,7 @@ function ResumePage({ onAdminClick }: ResumePageProps) {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString(t('resume.locale'), { year: 'numeric', month: 'long' });
-  };
+  const formatDate = (dateString: string) => formatMonthYear(dateString, t('resume.locale'));
 
   return (
     <div className={`resume-page theme-${theme}`}>
@@ -91,23 +88,33 @@ function ResumePage({ onAdminClick }: ResumePageProps) {
                 <h3>{t('resume.downloadCV')}</h3>
                 <p>{t('resume.cvDescription')}</p>
                 <div className="cv-actions">
-                  <a 
-                    href={cvUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <button
                     className="btn btn-primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // The GetCvUrl endpoint returns the latest resume ID in the FileUrl
+                      // We need to extract the ID from the latest resume
+                      window.open(`/api/resume/download-latest`, '_blank');
+                    }}
                   >
                     <i className="fas fa-eye me-2"></i>
                     {t('resume.viewCV')}
-                  </a>
-                  <a 
-                    href={cvUrl} 
-                    download 
+                  </button>
+                  <button
                     className="btn btn-outline-primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const link = document.createElement('a');
+                      link.href = `/api/resume/download-latest`;
+                      link.download = 'Bianca B. - CV.pdf';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
                   >
                     <i className="fas fa-download me-2"></i>
                     {t('resume.downloadButton')}
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>

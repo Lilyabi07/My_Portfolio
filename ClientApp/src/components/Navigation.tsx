@@ -92,10 +92,26 @@ function Navigation({ isLoggedIn = false, onAdminClick, onLogout }: NavigationPr
             </li>
             <li className="nav-item">
               <Link
+                className={`nav-link ${isActive('/education') ? 'active' : ''}`}
+                to="/education"
+              >
+                {t('nav.education')}
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link
                 className={`nav-link ${isActive('/resume') ? 'active' : ''}`}
                 to="/resume"
               >
                 {t('nav.resume')}
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link
+                className={`nav-link ${isActive('/hobbies') ? 'active' : ''}`}
+                to="/hobbies"
+              >
+                {t('nav.hobbies')}
               </Link>
             </li>
             <li className="nav-item">

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navigation from './Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import TitleReveal from './TitleReveal';
 import './HomePage.css';
 
 interface HomePageProps {
@@ -19,7 +20,9 @@ function HomePage({ onAdminClick }: HomePageProps) {
       
       <section className="hero-section">
         <div className="hero-content">
-          <h1 className="hero-title">{t('home.heroTitle')}</h1>
+          <h1 className="hero-title">
+            <TitleReveal text={t('home.heroTitle')} />
+          </h1>
           <p className="hero-subtitle">{t('home.heroSubtitle')}</p>
           <div className="hero-buttons">
             <Link to="/projects" className="btn btn-primary btn-lg">

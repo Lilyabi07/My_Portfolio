@@ -133,7 +133,7 @@ function SkillsManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Font Awesome Icon (e.g., fa-code)</label>
+              <label className="form-label">A quick description (e.g.your experience)</label>
               <input
                 type="text"
                 className="form-control"
