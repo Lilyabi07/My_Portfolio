@@ -232,3 +232,5 @@ Created as a final project portfolio for the Comprehensive Assessment course.
 ## Support
 
 For issues and questions, please open an issue in the GitHub repository.
+# My_Portfolio
+My final project portfolio, a website containing my personal career infromation. Presented to A. Bar for the Comprehesive assessment course
