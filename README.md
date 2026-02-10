@@ -2,24 +2,6 @@
 
 A fully responsive, dynamic portfolio website with an admin panel. Built using PHP following MVC architecture with bilingual support (English/Spanish).
 
-**NEW:** Now also supports ASP.NET MVC backend with React frontend! See [ASP.NET + React Setup Guide](README_ASPNET_REACT.md) for details.
-
-## Available Technology Stacks
-
-### Option 1: PHP Stack (Original)
-- **Backend:** PHP 7.4+ with PDO
-- **Database:** MySQL
-- **Frontend:** HTML5, CSS3, JavaScript, Bootstrap 5
-- **Architecture:** MVC (Model-View-Controller)
-
-### Option 2: ASP.NET + React Stack (New)
-- **Backend:** ASP.NET Core 8.0 MVC
-- **Database:** MySQL/SQL Server
-- **Frontend:** React 18 with TypeScript
-- **Architecture:** MVC + SPA
-
-📖 **See [ASPNET_REACT_INTEGRATION.md](ASPNET_REACT_INTEGRATION.md) for complete integration details**
-
 ## Features
 
 ### Public Website
@@ -44,25 +26,12 @@ A fully responsive, dynamic portfolio website with an admin panel. Built using P
 
 ## Technology Stack
 
-### PHP Stack (Original)
-
 - **Backend:** PHP 7.4+ with PDO
 - **Database:** MySQL
 - **Frontend:** HTML5, CSS3, JavaScript
 - **Framework:** Bootstrap 5
 - **Icons:** Font Awesome 6
 - **Architecture:** MVC (Model-View-Controller)
-
-### ASP.NET + React Stack (New)
-
-- **Backend:** ASP.NET Core 8.0 MVC
-- **Database:** MySQL/SQL Server with Entity Framework
-- **Frontend:** React 18 + TypeScript
-- **Framework:** Bootstrap 5
-- **Icons:** Font Awesome 6
-- **Architecture:** MVC + SPA (Single Page Application)
-
-For ASP.NET + React setup, see [README_ASPNET_REACT.md](README_ASPNET_REACT.md)
 
 ## Installation
 
