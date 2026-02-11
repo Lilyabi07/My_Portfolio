@@ -3,8 +3,8 @@ services:
     name: my-portfolio
     runtime: dotnet
     runtimeVersion: 8.0
-    buildCommand: dotnet publish -c Release -o out
-    startCommand: dotnet out/MyPortfolio.dll
+    buildCommand: bash build.sh
+    startCommand: bash start.sh
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
