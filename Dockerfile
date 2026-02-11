@@ -5,7 +5,7 @@ COPY ClientApp/package*.json ./
 RUN npm ci
 COPY ClientApp/ ./
 RUN npm run build
-
+ 
 # Build .NET app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
