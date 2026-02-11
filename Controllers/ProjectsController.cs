@@ -65,8 +65,10 @@ namespace MyPortfolio.Controllers
         {
             var project = new Project
             {
-                Title = request.Title,
-                Description = request.Description,
+                TitleEn = request.TitleEn,
+                TitleFr = request.TitleFr,
+                DescriptionEn = request.DescriptionEn,
+                DescriptionFr = request.DescriptionFr,
                 Technologies = request.Technologies,
                 ProjectUrl = request.ProjectUrl,
                 GithubUrl = request.GithubUrl,
@@ -89,8 +91,10 @@ namespace MyPortfolio.Controllers
             var existing = await _db.Projects.FindAsync(id);
             if (existing == null) return NotFound();
 
-            existing.Title = request.Title ?? existing.Title;
-            existing.Description = request.Description ?? existing.Description;
+            existing.TitleEn = request.TitleEn ?? existing.TitleEn;
+            existing.TitleFr = request.TitleFr ?? existing.TitleFr;
+            existing.DescriptionEn = request.DescriptionEn ?? existing.DescriptionEn;
+            existing.DescriptionFr = request.DescriptionFr ?? existing.DescriptionFr;
             existing.Technologies = request.Technologies ?? existing.Technologies;
             existing.ProjectUrl = request.ProjectUrl ?? existing.ProjectUrl;
             existing.GithubUrl = request.GithubUrl ?? existing.GithubUrl;
@@ -123,8 +127,10 @@ namespace MyPortfolio.Controllers
 
     public class CreateProjectRequest
     {
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        public string TitleEn { get; set; } = string.Empty;
+        public string TitleFr { get; set; } = string.Empty;
+        public string DescriptionEn { get; set; } = string.Empty;
+        public string DescriptionFr { get; set; } = string.Empty;
         public string Technologies { get; set; } = string.Empty;
         public string? ProjectUrl { get; set; }
         public string? GithubUrl { get; set; }
@@ -134,8 +140,10 @@ namespace MyPortfolio.Controllers
 
     public class UpdateProjectRequest
     {
-        public string? Title { get; set; }
-        public string? Description { get; set; }
+        public string? TitleEn { get; set; }
+        public string? TitleFr { get; set; }
+        public string? DescriptionEn { get; set; }
+        public string? DescriptionFr { get; set; }
         public string? Technologies { get; set; }
         public string? ProjectUrl { get; set; }
         public string? GithubUrl { get; set; }

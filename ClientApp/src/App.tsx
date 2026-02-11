@@ -5,6 +5,7 @@ import './App.css';
 import { setAuthToken } from './api';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { PageTransition } from './components/common/PageTransition';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import HomePage from './components/HomePage';
@@ -49,33 +50,35 @@ function AppContent() {
     <div className="App">
       <Routes>
         {/* Admin Routes */}
-        <Route path="/admin/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
+        <Route path="/admin/login" element={<PageTransition><Login onLoginSuccess={handleLoginSuccess} /></PageTransition>} />
         <Route
           path="/admin/dashboard"
           element={
-            isLoggedIn ? (
-              <Dashboard 
-                adminUsername={adminUsername}
-                onLogout={handleLogout}
-              />
-            ) : (
-              <Login onLoginSuccess={handleLoginSuccess} />
-            )
+            <PageTransition>
+              {isLoggedIn ? (
+                <Dashboard 
+                  adminUsername={adminUsername}
+                  onLogout={handleLogout}
+                />
+              ) : (
+                <Login onLoginSuccess={handleLoginSuccess} />
+              )}
+            </PageTransition>
           }
         />
 
         {/* Guest Routes */}
-        <Route path="/" element={<HomePage onAdminClick={handleAdminClick} />} />
-        <Route path="/projects" element={<ProjectsPage onAdminClick={handleAdminClick} />} />
-        <Route path="/testimonials" element={<TestimonialsPage onAdminClick={handleAdminClick} />} />
-        <Route path="/about" element={<AboutPage onAdminClick={handleAdminClick} />} />
-        <Route path="/resume" element={<ResumePage onAdminClick={handleAdminClick} />} />
-        <Route path="/education" element={<EducationPage onAdminClick={handleAdminClick} />} />
-        <Route path="/hobbies" element={<HobbiesPage onAdminClick={handleAdminClick} />} />
-        <Route path="/contact" element={<ContactPage onAdminClick={handleAdminClick} />} />
+        <Route path="/" element={<PageTransition><HomePage onAdminClick={handleAdminClick} /></PageTransition>} />
+        <Route path="/projects" element={<PageTransition><ProjectsPage onAdminClick={handleAdminClick} /></PageTransition>} />
+        <Route path="/testimonials" element={<PageTransition><TestimonialsPage onAdminClick={handleAdminClick} /></PageTransition>} />
+        <Route path="/about" element={<PageTransition><AboutPage onAdminClick={handleAdminClick} /></PageTransition>} />
+        <Route path="/resume" element={<PageTransition><ResumePage onAdminClick={handleAdminClick} /></PageTransition>} />
+        <Route path="/education" element={<PageTransition><EducationPage onAdminClick={handleAdminClick} /></PageTransition>} />
+        <Route path="/hobbies" element={<PageTransition><HobbiesPage onAdminClick={handleAdminClick} /></PageTransition>} />
+        <Route path="/contact" element={<PageTransition><ContactPage onAdminClick={handleAdminClick} /></PageTransition>} />
 
         {/* Catch-all redirect */}
-        <Route path="*" element={<HomePage onAdminClick={handleAdminClick} />} />
+        <Route path="*" element={<PageTransition><HomePage onAdminClick={handleAdminClick} /></PageTransition>} />
       </Routes>
     </div>
   );

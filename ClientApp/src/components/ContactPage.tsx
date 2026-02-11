@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Navigation from './Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useSpamPrevention } from '../hooks';
 import './ContactPage.css';
 import api from '../api';
 import { hasProfanity } from '../utils/badWordsFilter';
@@ -12,11 +13,14 @@ interface ContactPageProps {
 
 function ContactPage({ onAdminClick }: ContactPageProps) {
   const { theme } = useTheme();
-    const { t } = useLanguage();
+  const { t } = useLanguage();
+  const { validateSpamPrevention, getHoneypotProps } = useSpamPrevention();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    message: ''
+    message: '',
+    website: '' // Honeypot field
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -27,6 +31,14 @@ function ContactPage({ onAdminClick }: ContactPageProps) {
     setLoading(true);
     setError('');
     setSuccess(false);
+
+    // Validate spam prevention (honeypot + time)
+    const spamCheck = validateSpamPrevention(formData.website);
+    if (!spamCheck.valid) {
+      setError(spamCheck.error || 'Submission rejected');
+      setLoading(false);
+      return;
+    }
 
     // Check for profanity in message and name
     const combinedText = `${formData.name} ${formData.message}`;
@@ -39,9 +51,11 @@ function ContactPage({ onAdminClick }: ContactPageProps) {
     }
 
     try {
-      await api.post('/contact/send', formData);
+      // Only send the actual form fields (not the honeypot)
+      const { website, ...actualFormData } = formData;
+      await api.post('/contact/send', actualFormData);
       setSuccess(true);
-      setFormData({ name: '', email: '', message: '' });
+      setFormData({ name: '', email: '', message: '', website: '' });
     } catch (err: any) {
       setError(err.response?.data?.message || t('contact.error'));
     } finally {
@@ -80,6 +94,15 @@ function ContactPage({ onAdminClick }: ContactPageProps) {
                 )}
 
                 <form onSubmit={handleSubmit}>
+                  {/* Honeypot field - hidden from users, only bots fill this */}
+                  <input
+                    type="text"
+                    name="website"
+                    value={formData.website}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                    {...getHoneypotProps()}
+                  />
+
                   <div className="mb-4">
                     <label htmlFor="name" className="form-label">{t('contact.name')}</label>
                     <input

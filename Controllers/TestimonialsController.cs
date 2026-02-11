@@ -65,29 +65,21 @@ namespace MyPortfolio.Controllers
             if (testimonial == null || string.IsNullOrWhiteSpace(testimonial.Name) || string.IsNullOrWhiteSpace(testimonial.Message))
                 return BadRequest("Name and Message are required");
 
-            // Get client IP for rate limiting
-            var clientIp = RateLimitService.GetClientIdentifier(HttpContext);
-
             // Rate limit: 3 testimonials per IP per 24 hours
-            var rateLimitResult = await _rateLimitService.CheckRateLimitAsync(
-                clientIp,
+            var retrySeconds = (int)(24 * 3600); // Used for formatted message
+            var retryHours = retrySeconds / 3600;
+            var retryMinutes = (retrySeconds % 3600) / 60;
+
+            var rateLimitError = await _rateLimitService.ValidateRateLimitAsync(
+                HttpContext,
                 "testimonial_submit",
                 TimeSpan.FromHours(24),
-                3);
+                3,
+                _logger,
+                $"Too many testimonial submissions. Please try again in {{hours}}h {{minutes}}m.");
 
-            if (!rateLimitResult.allowed)
-            {
-                var retrySeconds = (int)rateLimitResult.retryAfter.TotalSeconds;
-                var retryHours = retrySeconds / 3600;
-                var retryMinutes = (retrySeconds % 3600) / 60;
-                
-                _logger.LogWarning($"Testimonial submission rate limit exceeded for IP: {clientIp}. Retry after: {retrySeconds}s");
-                return StatusCode(429, new
-                {
-                    message = $"Too many testimonial submissions. Please try again in {retryHours}h {retryMinutes}m.",
-                    retryAfter = retrySeconds
-                });
-            }
+            if (rateLimitError != null)
+                return rateLimitError;
 
             testimonial.IsPublished = false; // New testimonials are pending approval
             testimonial.SubmittedDate = DateTime.UtcNow;
@@ -97,13 +89,13 @@ namespace MyPortfolio.Controllers
 
             await _notifications.SendEntityChangedAsync("testimonials", "create", testimonial);
 
+            var clientIp = RateLimitService.GetClientIdentifier(HttpContext);
             _logger.LogInformation($"New testimonial submitted from {testimonial.Name} (IP: {clientIp}). Pending approval.");
 
             return CreatedAtAction(nameof(GetTestimonial), new { id = testimonial.Id }, new 
             { 
                 id = testimonial.Id,
-                message = "Thank you for your testimonial! It will be reviewed and published shortly.",
-                remaining = rateLimitResult.remaining
+                message = "Thank you for your testimonial! It will be reviewed and published shortly."
             });
         }
 

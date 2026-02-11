@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import api from '../api';
+import React, { useState } from 'react';
 import Navigation from './Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useFetchData, useScrollAnimation } from '../hooks';
+import { LoadingSkeleton, EmptyState } from './common';
 import './ProjectsPage.css';
 
 interface Project {
@@ -20,34 +21,10 @@ interface ProjectsPageProps {
 }
 
 function ProjectsPage({ onAdminClick }: ProjectsPageProps) {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: projects, loading, error } = useFetchData<Project>('/projects');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { theme } = useTheme();
   const { t } = useLanguage();
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await api.get('/projects');
-      if (Array.isArray(response.data)) {
-        setProjects(response.data);
-      } else {
-        setError(t('projects.invalidData'));
-      }
-    } catch (err) {
-      setError(t('projects.loadError'));
-      console.error('Error fetching projects:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className={`projects-page theme-${theme}`}>
@@ -63,61 +40,30 @@ function ProjectsPage({ onAdminClick }: ProjectsPageProps) {
       <section className="projects-list">
         <div className="container py-5">
           {loading ? (
-            <div className="loading">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">{t('common.loading')}</span>
-              </div>
-              <p>{t('projects.loading')}</p>
+            <div className="row g-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="col-md-6 col-lg-4">
+                  <LoadingSkeleton type="card" />
+                </div>
+              ))}
             </div>
           ) : error ? (
-            <div className="alert alert-info" role="alert">
-              {error}
-            </div>
+            <EmptyState
+              icon="fas fa-exclamation-circle"
+              title={t('common.error')}
+              message={error}
+            />
           ) : projects.length === 0 ? (
-            <div className="alert alert-info" role="alert">
-              {t('projects.empty')}
-            </div>
+            <EmptyState
+              icon="fas fa-briefcase"
+              title={t('projects.empty')}
+              message="No projects available yet. Check back soon!"
+              customEmoji="📋"
+            />
           ) : (
             <div className="row g-4">
-              {projects.map((project) => (
-                <div key={project.id} className="col-md-6 col-lg-4">
-                  <div className="project-card" onClick={() => setSelectedProject(project)} style={{ cursor: 'pointer' }}>
-                    {project.imageUrl && (
-                      <div className="project-image">
-                        <img src={project.imageUrl} alt={project.title} />
-                      </div>
-                    )}
-                    <div className="project-content">
-                      <h3 className="project-title">{project.title}</h3>
-                      <p className="project-description">
-                        {project.description.length > 100 
-                          ? `${project.description.substring(0, 100)}...` 
-                          : project.description}
-                      </p>
-                      {Array.isArray(project.technologies) && project.technologies.length > 0 && (
-                        <div className="project-tech">
-                          {project.technologies.map((tech, idx) => (
-                            <span key={idx} className="tech-badge">
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      <div className="project-links">
-                        {project.link && (
-                          <a href={project.link} target="_blank" rel="noopener noreferrer" className="btn-link">
-                            {t('projects.viewDemo')}
-                          </a>
-                        )}
-                        {project.github && (
-                          <a href={project.github} target="_blank" rel="noopener noreferrer" className="btn-link">
-                            {t('projects.sourceCode')}
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              {projects.map((project, index) => (
+                <ProjectCard key={project.id} project={project} index={index} onSelect={setSelectedProject} />
               ))}
             </div>
           )}
@@ -195,6 +141,59 @@ function ProjectsPage({ onAdminClick }: ProjectsPageProps) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// Separate component for project cards to apply scroll animations
+interface ProjectCardProps {
+  project: Project;
+  index: number;
+  onSelect: (project: Project) => void;
+}
+
+function ProjectCard({ project, index, onSelect }: ProjectCardProps) {
+  const scrollRef = useScrollAnimation({ threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  const { t } = useLanguage();
+
+  return (
+    <div ref={scrollRef} className="col-md-6 col-lg-4">
+      <div className="project-card" onClick={() => onSelect(project)} style={{ cursor: 'pointer' }}>
+        {project.imageUrl && (
+          <div className="project-image">
+            <img src={project.imageUrl} alt={project.title} />
+          </div>
+        )}
+        <div className="project-content">
+          <h3 className="project-title">{project.title}</h3>
+          <p className="project-description">
+            {project.description.length > 100 
+              ? `${project.description.substring(0, 100)}...` 
+              : project.description}
+          </p>
+          {Array.isArray(project.technologies) && project.technologies.length > 0 && (
+            <div className="project-tech">
+              {project.technologies.map((tech, idx) => (
+                <span key={idx} className="tech-badge">
+                  {tech}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="project-links">
+            {project.link && (
+              <a href={project.link} target="_blank" rel="noopener noreferrer" className="btn-link">
+                {t('projects.viewDemo')}
+              </a>
+            )}
+            {project.github && (
+              <a href={project.github} target="_blank" rel="noopener noreferrer" className="btn-link">
+                {t('projects.sourceCode')}
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

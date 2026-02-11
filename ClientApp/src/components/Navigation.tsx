@@ -37,14 +37,6 @@ function Navigation({ isLoggedIn = false, onAdminClick, onLogout }: NavigationPr
         <div className="collapse navbar-collapse" id="navbarNav">
           <div className="navbar-left-controls">
             <button
-              className="nav-link language-toggle"
-              onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')}
-              title={t('common.language')}
-              aria-label={t('common.language')}
-            >
-              <i className="fas fa-globe"></i> {language.toUpperCase()}
-            </button>
-            <button
               className="nav-link theme-toggle"
               onClick={toggleTheme}
               title={theme === 'dark' ? t('common.switchToLight') : t('common.switchToDark')}
@@ -68,6 +60,14 @@ function Navigation({ isLoggedIn = false, onAdminClick, onLogout }: NavigationPr
             </li>
             <li className="nav-item">
               <Link
+                className={`nav-link ${isActive('/about') ? 'active' : ''}`}
+                to="/about"
+              >
+                {t('nav.about')}
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link
                 className={`nav-link ${isActive('/projects') ? 'active' : ''}`}
                 to="/projects"
               >
@@ -80,22 +80,6 @@ function Navigation({ isLoggedIn = false, onAdminClick, onLogout }: NavigationPr
                 to="/testimonials"
               >
                 {t('nav.testimonials')}
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                className={`nav-link ${isActive('/about') ? 'active' : ''}`}
-                to="/about"
-              >
-                {t('nav.about')}
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
-                className={`nav-link ${isActive('/education') ? 'active' : ''}`}
-                to="/education"
-              >
-                {t('nav.education')}
               </Link>
             </li>
             <li className="nav-item">
@@ -138,6 +122,16 @@ function Navigation({ isLoggedIn = false, onAdminClick, onLogout }: NavigationPr
                   {t('nav.login')}
                 </button>
               )}
+            </li>
+            <li className="nav-item">
+              <button
+                className="nav-link language-toggle"
+                onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')}
+                title={t('common.language')}
+                aria-label={t('common.language')}
+              >
+                <i className="fas fa-globe"></i> {language.toUpperCase()}
+              </button>
             </li>
           </ul>
         </div>

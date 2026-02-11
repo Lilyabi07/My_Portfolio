@@ -25,9 +25,15 @@ namespace MyPortfolio.Services
                 var recipientEmail = _configuration["Email:RecipientEmail"] ?? "Motie.Kleffman@AllWebEmails.com";
                 var fromEmail = _configuration["Email:FromEmail"] ?? smtpUsername ?? "noreply@portfolio.com";
 
-                if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(smtpUsername) || string.IsNullOrEmpty(smtpPassword))
+                // Check if email is properly configured (not placeholder values)
+                if (string.IsNullOrEmpty(smtpHost) || 
+                    string.IsNullOrEmpty(smtpUsername) || 
+                    string.IsNullOrEmpty(smtpPassword) ||
+                    smtpUsername.Contains("your-email") ||
+                    smtpPassword.Contains("your-app-password"))
                 {
-                    throw new InvalidOperationException("Email configuration is incomplete. Please configure SMTP settings in appsettings.json");
+                    _logger.LogWarning("Email configuration is incomplete or contains placeholder values. Contact message saved to database without email notification.");
+                    return; // Skip email sending, but don't fail the contact form submission
                 }
 
                 using var smtpClient = new SmtpClient(smtpHost, smtpPort)
@@ -64,8 +70,8 @@ This message was sent from the portfolio contact form.
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to send contact email from {senderName} ({senderEmail})");
-                throw;
+                _logger.LogError(ex, $"Failed to send contact email from {senderName} ({senderEmail}). The message was still saved to the database.");
+                // Don't rethrow - we don't want email failures to break the contact form submission
             }
         }
     }

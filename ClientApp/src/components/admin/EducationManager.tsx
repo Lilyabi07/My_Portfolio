@@ -6,11 +6,14 @@ import './EducationManager.css';
 interface Education {
   id: number;
   institution: string;
+  institutionFr?: string;
   degree: string;
+  degreeFr?: string;
   startDate: string;
   endDate?: string;
   isCurrent: boolean;
   description: string;
+  descriptionFr?: string;
   displayOrder: number;
 }
 
@@ -20,11 +23,14 @@ function EducationManager() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<Omit<Education, 'id'>>({
     institution: '',
+    institutionFr: '',
     degree: '',
+    degreeFr: '',
     startDate: new Date().toISOString().split('T')[0],
     endDate: undefined,
     isCurrent: false,
     description: '',
+    descriptionFr: '',
     displayOrder: 0
   });
   const [error, setError] = useState('');
@@ -86,11 +92,14 @@ function EducationManager() {
     setEditingId(education.id);
     setFormData({
       institution: education.institution,
+      institutionFr: education.institutionFr || '',
       degree: education.degree,
+      degreeFr: education.degreeFr || '',
       startDate: education.startDate.split('T')[0],
       endDate: education.endDate ? education.endDate.split('T')[0] : undefined,
       isCurrent: education.isCurrent,
       description: education.description,
+      descriptionFr: education.descriptionFr || '',
       displayOrder: education.displayOrder
     });
   };
@@ -99,11 +108,14 @@ function EducationManager() {
     setEditingId(null);
     setFormData({
       institution: '',
+      institutionFr: '',
       degree: '',
+      degreeFr: '',
       startDate: new Date().toISOString().split('T')[0],
       endDate: undefined,
       isCurrent: false,
       description: '',
+      descriptionFr: '',
       displayOrder: 0
     });
   };
@@ -135,6 +147,18 @@ function EducationManager() {
             </div>
 
             <div className="mb-3">
+              <label className="form-label">Degree/Certification (French)</label>
+              <input
+                type="text"
+                className="form-control"
+                value={formData.degreeFr}
+                onChange={(e) => setFormData({ ...formData, degreeFr: e.target.value })}
+                placeholder="e.g., Baccalauréat en sciences"
+              />
+              <small className="text-muted">Optional: French translation of the degree</small>
+            </div>
+
+            <div className="mb-3">
               <label className="form-label">Institution</label>
               <input
                 type="text"
@@ -144,6 +168,18 @@ function EducationManager() {
                 placeholder="e.g., University Name"
                 required
               />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Institution (French)</label>
+              <input
+                type="text"
+                className="form-control"
+                value={formData.institutionFr}
+                onChange={(e) => setFormData({ ...formData, institutionFr: e.target.value })}
+                placeholder="e.g., Nom de l'université"
+              />
+              <small className="text-muted">Optional: French translation of the institution name</small>
             </div>
 
             <div className="mb-3">
@@ -193,6 +229,18 @@ function EducationManager() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Additional details about your education..."
               />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Description (French)</label>
+              <textarea
+                className="form-control"
+                rows={3}
+                value={formData.descriptionFr}
+                onChange={(e) => setFormData({ ...formData, descriptionFr: e.target.value })}
+                placeholder="Détails supplémentaires sur votre éducation..."
+              />
+              <small className="text-muted">Optional: French translation of the description</small>
             </div>
 
             <div className="mb-3">

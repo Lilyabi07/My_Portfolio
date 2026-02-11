@@ -188,7 +188,7 @@ function ContactMessagesManager() {
 
                 <div className="mb-3">
                   <label className="form-label text-muted">Message</label>
-                  <div className="message-content p-3 border rounded" style={{ backgroundColor: '#f8f9fa', minHeight: '150px' }}>
+                  <div className="message-content p-3 border rounded" style={{ minHeight: '150px' }}>
                     {selectedMessage.message}
                   </div>
                 </div>

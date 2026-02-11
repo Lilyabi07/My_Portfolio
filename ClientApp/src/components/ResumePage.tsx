@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import api from '../api';
+import React, { useState } from 'react';
 import Navigation from './Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useFetchData } from '../hooks';
 import { formatMonthYear, sortByDisplayOrder } from '../utils/formatters';
 import './ResumePage.css';
 
@@ -17,51 +17,35 @@ interface WorkExperience {
   displayOrder: number;
 }
 
+interface Education {
+  id: number;
+  institution: string;
+  institutionFr?: string;
+  degree: string;
+  degreeFr?: string;
+  startDate: string;
+  endDate?: string;
+  isCurrent: boolean;
+  description: string;
+  descriptionFr?: string;
+  displayOrder: number;
+}
+
 interface ResumePageProps {
   onAdminClick?: () => void;
 }
 
 function ResumePage({ onAdminClick }: ResumePageProps) {
-  const [experiences, setExperiences] = useState<WorkExperience[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [cvUrl, setCvUrl] = useState<string | null>(null);
+  const { data: experiencesRaw, loading: loadingExp, error: errorExp } = useFetchData<WorkExperience>('/work-experience');
+  const { data: educationsRaw, loading: loadingEdu, error: errorEdu } = useFetchData<Education>('/education');
   const { theme } = useTheme();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
-  useEffect(() => {
-    fetchExperiences();
-    fetchCvUrl();
-  }, []);
-
-  const fetchExperiences = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await api.get('/work-experience');
-      if (Array.isArray(response.data)) {
-        setExperiences(sortByDisplayOrder(response.data));
-      } else {
-        setError(t('resume.invalidData'));
-      }
-    } catch (err) {
-      setError(t('resume.loadError'));
-      console.error('Error fetching work experience:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCvUrl = async () => {
-    try {
-      const response = await api.get('/resume/cv-url');
-      if (response.data.cvUrl) {
-        setCvUrl(response.data.cvUrl);
-      }
-    } catch (err) {
-      console.error('Error fetching CV URL:', err);
-    }
-  };
+  // Sort data
+  const experiences = sortByDisplayOrder(experiencesRaw);
+  const educations = sortByDisplayOrder(educationsRaw);
+  const loading = loadingExp || loadingEdu;
+  const error = errorExp || errorEdu;
 
   const formatDate = (dateString: string) => formatMonthYear(dateString, t('resume.locale'));
 
@@ -76,57 +60,51 @@ function ResumePage({ onAdminClick }: ResumePageProps) {
         </div>
       </section>
 
-      {/* CV Download Section */}
-      <section className="cv-section">
+      {/* Education Timeline */}
+      <section className="education-section">
         <div className="container py-5">
-          {cvUrl ? (
-            <div className="cv-card">
-              <div className="cv-icon">
-                <i className="fas fa-file-pdf"></i>
-              </div>
-              <div className="cv-content">
-                <h3>{t('resume.downloadCV')}</h3>
-                <p>{t('resume.cvDescription')}</p>
-                <div className="cv-actions">
-                  <button
-                    className="btn btn-primary"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      // The GetCvUrl endpoint returns the latest resume ID in the FileUrl
-                      // We need to extract the ID from the latest resume
-                      window.open(`/api/resume/download-latest`, '_blank');
-                    }}
-                  >
-                    <i className="fas fa-eye me-2"></i>
-                    {t('resume.viewCV')}
-                  </button>
-                  <button
-                    className="btn btn-outline-primary"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const link = document.createElement('a');
-                      link.href = `/api/resume/download-latest`;
-                      link.download = 'Bianca B. - CV.pdf';
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
-                  >
-                    <i className="fas fa-download me-2"></i>
-                    {t('resume.downloadButton')}
-                  </button>
-                </div>
-              </div>
+          <h2 className="section-title">{t('education.educationHistory')}</h2>
+          {educations.length === 0 ? (
+            <div className="alert alert-info" role="alert">
+              {t('education.noEducation')}
             </div>
           ) : (
-            <div className="cv-card no-cv">
-              <div className="cv-icon">
-                <i className="fas fa-file-excel"></i>
-              </div>
-              <div className="cv-content">
-                <h3>{t('resume.noCVAvailable')}</h3>
-                <p className="text-muted">The CV will be available soon. Please check back later.</p>
-              </div>
+            <div className="timeline">
+              {educations.map((edu) => {
+                const displayDegree = language === 'fr' && edu.degreeFr ? edu.degreeFr : edu.degree;
+                const displayInstitution = language === 'fr' && edu.institutionFr ? edu.institutionFr : edu.institution;
+                const displayDescription = language === 'fr' && edu.descriptionFr ? edu.descriptionFr : edu.description;
+                
+                return (
+                  <div key={edu.id} className="timeline-item">
+                    <div className="timeline-marker"></div>
+                    <div className="timeline-content">
+                      <div className="education-card">
+                        <div className="education-header">
+                          <div>
+                            <h3 className="degree">{displayDegree}</h3>
+                            <h4 className="institution">{displayInstitution}</h4>
+                          </div>
+                          {edu.isCurrent && (
+                            <span className="badge-current">
+                              <i className="fas fa-circle"></i> {t('education.current')}
+                            </span>
+                          )}
+                        </div>
+                        <div className="date-info">
+                          <span className="date-range">
+                            <i className="fas fa-calendar me-2"></i>
+                            {formatDate(edu.startDate)} - {edu.isCurrent ? t('education.present') : formatDate(edu.endDate || '')}
+                          </span>
+                        </div>
+                        {displayDescription && (
+                          <p className="description">{displayDescription}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

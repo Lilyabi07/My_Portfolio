@@ -1,7 +1,7 @@
 .testimonials-manager h2 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #0a0e27;
+  color: #66bbff;
   margin-bottom: 1.5rem;
 }
 
@@ -36,26 +36,31 @@
 }
 
 .testimonial-card {
-  background: white;
-  border-radius: 0;
+  background: rgba(30, 58, 95, 0.5);
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #2a6ee6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-left: 5px solid #66bbff;
+  border: 1px solid rgba(102, 187, 255, 0.2);
   transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 .testimonial-card.pending {
-  border-left-color: #ffc107;
-  background: linear-gradient(135deg, rgba(255, 193, 7, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+  border-left-color: #ffb74d;
+  border-color: rgba(255, 183, 77, 0.3);
+  background: rgba(255, 183, 77, 0.05);
 }
 
 .testimonial-card.published {
-  border-left-color: #28a745;
+  border-left-color: #90ee90;
+  border-color: rgba(144, 238, 144, 0.3);
 }
 
 .testimonial-card:hover {
-  box-shadow: 0 8px 16px rgba(0, 114, 177, 0.2);
+  box-shadow: 0 8px 20px rgba(102, 187, 255, 0.3);
   transform: translateY(-2px);
+  border-color: #66bbff;
 }
 
 .testimonial-header {
@@ -69,7 +74,7 @@
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #0072B1;
+  border: 2px solid #66bbff;
   flex-shrink: 0;
 }
 
@@ -80,20 +85,21 @@
 .testimonial-info h5 {
   margin: 0;
   font-weight: 600;
-  color: #004F7F;
+  color: #66bbff;
   font-size: 0.95rem;
 }
 
 .testimonial-info .meta {
   margin: 0.25rem 0 0 0;
   font-size: 0.85rem;
-  color: rgba(184, 212, 241, 0.7);
+  color: rgba(184, 212, 241, 0.9);
+  font-weight: 500;
 }
 
 .testimonial-info .date {
   margin: 0.25rem 0 0 0;
   font-size: 0.75rem;
-  color: rgba(184, 212, 241, 0.6);
+  color: rgba(184, 212, 241, 0.8);
 }
 
 .stars {
@@ -103,7 +109,7 @@
 }
 
 .stars i {
-  color: #ffc107;
+  color: #ffb74d;
   font-size: 0.85rem;
 }
 
@@ -112,7 +118,7 @@
 }
 
 .message {
-  color: rgba(184, 212, 241, 0.9);
+  color: rgba(245, 245, 245, 0.95);
   font-style: italic;
   font-size: 0.95rem;
   margin: 1rem 0;
@@ -133,34 +139,43 @@
 }
 
 .edit-form-section {
-  background: #f8f9fa;
+  background: rgba(30, 58, 95, 0.4);
   padding: 2rem;
-  border-radius: 0;
+  border-radius: 12px;
   margin-top: 2rem;
-  border: 2px solid #2a6ee6;
+  border: 1px solid rgba(102, 187, 255, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .edit-form-section h4 {
-  color: #0a0e27;
+  color: #66bbff;
   margin-bottom: 1.5rem;
   font-weight: 600;
 }
 
 .testimonial-form .form-label {
   font-weight: 600;
-  color: #0a0e27;
+  color: rgba(184, 212, 241, 0.9);
   margin-bottom: 0.5rem;
 }
 
 .testimonial-form .form-control,
 .testimonial-form .form-select {
-  border-color: #ddd;
+  background: rgba(15, 39, 68, 0.6);
+  border: 1px solid rgba(102, 187, 255, 0.2);
+  color: #f5f5f5;
+}
+
+.testimonial-form .form-control::placeholder {
+  color: rgba(184, 212, 241, 0.5);
 }
 
 .testimonial-form .form-control:focus,
 .testimonial-form .form-select:focus {
-  border-color: #2a6ee6;
-  box-shadow: 0 0 0 0.2rem rgba(42, 110, 230, 0.25);
+  border-color: #66bbff;
+  background: rgba(15, 39, 68, 0.8);
+  box-shadow: 0 0 0 0.2rem rgba(102, 187, 255, 0.25);
+  color: #f5f5f5;
 }
 
 @media (max-width: 768px) {
@@ -182,14 +197,51 @@
   color: #5a6c7d;
 }
 
-.theme-light .testimonial-info .meta {
+.theme-light .testimonial-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(42, 110, 230, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .testimonial-card:hover {
+  box-shadow: 0 8px 16px rgba(42, 110, 230, 0.15);
+}
+
+.theme-light .testimonial-info h5 {
+  color: #2a6ee6;
+}
+
+.theme-light .testimonial-info .meta,
+.theme-light .testimonial-info .date {
   color: #5a6c7d;
 }
 
 .theme-light .message {
-  color: #5a6c7d;
+  color: #2c3e50;
 }
 
-.theme-light .testimonial-info .date {
-  color: #7a8c9e;
+.theme-light .edit-form-section {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: #d0e1f9;
+}
+
+.theme-light .edit-form-section h4 {
+  color: #2a6ee6;
+}
+
+.theme-light .testimonial-form .form-label {
+  color: #2c3e50;
+}
+
+.theme-light .testimonial-form .form-control,
+.theme-light .testimonial-form .form-select {
+  background: white;
+  border-color: #ddd;
+  color: #2c3e50;
+}
+
+.theme-light .testimonial-form .form-control:focus,
+.theme-light .testimonial-form .form-select:focus {
+  border-color: #2a6ee6;
+  background: white;
 }

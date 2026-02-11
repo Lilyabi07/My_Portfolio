@@ -230,6 +230,15 @@
 .tab-content h5,
 .tab-content h6 {
   color: #66bbff;
+  font-weight: 600;
+}
+
+.tab-content p,
+.tab-content label,
+.tab-content li,
+.tab-content span,
+.tab-content div:not(.form-control):not(.btn):not(.badge) {
+  color: rgba(245, 245, 245, 0.95);
 }
 
 .tab-content strong {
@@ -286,16 +295,112 @@
 .tab-content .card {
   background: rgba(30, 58, 95, 0.3);
   border: 1px solid rgba(102, 187, 255, 0.2);
-  border-radius: 8px;
+  border-radius: 12px;
   transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 .tab-content .card:hover {
   border-color: #66bbff;
-  box-shadow: 0 4px 12px rgba(42, 110, 230, 0.2);
+  box-shadow: 0 8px 24px rgba(102, 187, 255, 0.25);
+  transform: translateY(-2px);
 }
 
-/* Responsive */
+.tab-content .card-header {
+  background: rgba(102, 187, 255, 0.08);
+  border-color: rgba(102, 187, 255, 0.2);
+  border-radius: 12px 12px 0 0;
+}
+
+.tab-content .card-header h5,
+.tab-content .card-header h6 {
+  color: #66bbff;
+  margin: 0;
+  font-weight: 600;
+}
+
+.tab-content .card-body {
+  color: rgba(245, 245, 245, 0.95);
+}
+
+.tab-content .card-body h5,
+.tab-content .card-body h6 {
+  color: #66bbff;
+}
+
+.tab-content .card-text {
+  color: rgba(245, 245, 245, 0.9);
+}
+
+/* Table and List Items - Dark Theme */
+.tab-content table,
+.tab-content tbody,
+.tab-content thead,
+.tab-content tr,
+.tab-content td,
+.tab-content th {
+  color: rgba(245, 245, 245, 0.95);
+}
+
+.tab-content thead {
+  background: rgba(102, 187, 255, 0.1);
+  border-bottom: 2px solid rgba(102, 187, 255, 0.3);
+}
+
+.tab-content thead th {
+  color: #66bbff;
+  font-weight: 600;
+  border-color: rgba(102, 187, 255, 0.2);
+}
+
+.tab-content tbody tr:hover {
+  background: rgba(102, 187, 255, 0.05);
+}
+
+.tab-content tbody td {
+  border-color: rgba(102, 187, 255, 0.1);
+}
+
+.tab-content ul,
+.tab-content ol {
+  color: rgba(245, 245, 245, 0.95);
+}
+
+.tab-content li {
+  color: rgba(245, 245, 245, 0.95);
+}
+
+.tab-content a {
+  color: #66bbff;
+  text-decoration: none;
+}
+
+.tab-content a:hover {
+  color: #90d5ff;
+  text-decoration: underline;
+}
+
+/* Description and Info Boxes */
+.tab-content .description-box,
+.tab-content .info-box,
+.tab-content .note-box {
+  background: rgba(30, 58, 95, 0.3);
+  border-left: 4px solid #66bbff;
+  border-radius: 8px;
+  padding: 1rem;
+  color: rgba(245, 245, 245, 0.95);
+  margin: 1rem 0;
+}
+
+.tab-content .info-text,
+.tab-content .description-text,
+.tab-content .item-description {
+  color: rgba(245, 245, 245, 0.9);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .tab-content {
     padding: 1.5rem;
@@ -346,6 +451,125 @@
 .theme-light .nav-pills .nav-link.active {
   background: linear-gradient(135deg, #2a6ee6 0%, #1a4e9e 100%);
   color: white;
+}
+
+.theme-light .tab-content {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #d0e1f9;
+}
+
+.theme-light .tab-content h2,
+.theme-light .tab-content h3,
+.theme-light .tab-content h4,
+.theme-light .tab-content h5,
+.theme-light .tab-content h6 {
+  color: #2a6ee6;
+}
+
+.theme-light .tab-content p,
+.theme-light .tab-content label,
+.theme-light .tab-content li,
+.theme-light .tab-content span,
+.theme-light .tab-content div:not(.form-control):not(.btn):not(.badge) {
+  color: #2c3e50;
+}
+
+.theme-light .tab-content strong {
+  color: #2c3e50;
+}
+
+.theme-light .tab-content small {
+  color: #7a8c9e;
+}
+
+/* Light Theme Table and Lists */
+.theme-light .tab-content table,
+.theme-light .tab-content tbody,
+.theme-light .tab-content thead,
+.theme-light .tab-content tr,
+.theme-light .tab-content td,
+.theme-light .tab-content th {
+  color: #2c3e50;
+}
+
+.theme-light .tab-content thead {
+  background: rgba(42, 110, 230, 0.08);
+  border-bottom-color: #d0e1f9;
+}
+
+.theme-light .tab-content thead th {
+  color: #2a6ee6;
+  border-color: #d0e1f9;
+}
+
+.theme-light .tab-content tbody tr:hover {
+  background: rgba(42, 110, 230, 0.04);
+}
+
+.theme-light .tab-content tbody td {
+  border-color: #e0e0e0;
+}
+
+.theme-light .tab-content ul,
+.theme-light .tab-content ol,
+.theme-light .tab-content li {
+  color: #2c3e50;
+}
+
+.theme-light .tab-content a {
+  color: #2a6ee6;
+}
+
+.theme-light .tab-content a:hover {
+  color: #1a4e9e;
+}
+
+.theme-light .tab-content .description-box,
+.theme-light .tab-content .info-box,
+.theme-light .tab-content .note-box {
+  background: rgba(42, 110, 230, 0.08);
+  border-left-color: #2a6ee6;
+  color: #2c3e50;
+}
+
+.theme-light .tab-content .info-text,
+.theme-light .tab-content .description-text,
+.theme-light .tab-content .item-description {
+  color: #2c3e50;
+}
+
+/* Light Theme Cards */
+.theme-light .tab-content .card {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #d0e1f9;
+}
+
+.theme-light .tab-content .card:hover {
+  border-color: #2a6ee6;
+  box-shadow: 0 8px 24px rgba(42, 110, 230, 0.15);
+}
+
+.theme-light .tab-content .card-header {
+  background: rgba(42, 110, 230, 0.08);
+  border-color: #d0e1f9;
+}
+
+.theme-light .tab-content .card-header h5,
+.theme-light .tab-content .card-header h6 {
+  color: #2a6ee6;
+}
+
+.theme-light .tab-content .card-body {
+  color: #2c3e50;
+}
+
+.theme-light .tab-content .card-body h5,
+.theme-light .tab-content .card-body h6 {
+  color: #2a6ee6;
+}
+
+.theme-light .tab-content .card-text {
+  color: #2c3e50;
 }
 
 .theme-light .tab-content {

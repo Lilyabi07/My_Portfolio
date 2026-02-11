@@ -6,8 +6,10 @@ import './HobbiesManager.css';
 interface Hobby {
   id: number;
   name: string;
+  nameFr?: string;
   icon?: string;
   description?: string;
+  descriptionFr?: string;
   displayOrder: number;
 }
 
@@ -17,8 +19,10 @@ function HobbiesManager() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<Omit<Hobby, 'id'>>({
     name: '',
+    nameFr: '',
     icon: '',
     description: '',
+    descriptionFr: '',
     displayOrder: 0
   });
   const [error, setError] = useState('');
@@ -80,8 +84,10 @@ function HobbiesManager() {
     setEditingId(hobby.id);
     setFormData({
       name: hobby.name,
+      nameFr: hobby.nameFr || '',
       icon: hobby.icon || '',
       description: hobby.description || '',
+      descriptionFr: hobby.descriptionFr || '',
       displayOrder: hobby.displayOrder
     });
   };
@@ -90,8 +96,10 @@ function HobbiesManager() {
     setEditingId(null);
     setFormData({
       name: '',
+      nameFr: '',
       icon: '',
       description: '',
+      descriptionFr: '',
       displayOrder: 0
     });
   };
@@ -143,6 +151,18 @@ function HobbiesManager() {
             </div>
 
             <div className="mb-3">
+              <label className="form-label">Hobby Name (French)</label>
+              <input
+                type="text"
+                className="form-control"
+                value={formData.nameFr}
+                onChange={(e) => setFormData({ ...formData, nameFr: e.target.value })}
+                placeholder="e.g., Photographie, Lecture, Jeux vidéo"
+              />
+              <small className="text-muted">Optional: French translation of the hobby name</small>
+            </div>
+
+            <div className="mb-3">
               <label className="form-label"> Add a Fun Icon</label>
               <div className="icon-selector">
                 <input
@@ -186,6 +206,18 @@ function HobbiesManager() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Tell us more about this hobby..."
               />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Description (French)</label>
+              <textarea
+                className="form-control"
+                rows={3}
+                value={formData.descriptionFr}
+                onChange={(e) => setFormData({ ...formData, descriptionFr: e.target.value })}
+                placeholder="Parlez-nous de ce loisir..."
+              />
+              <small className="text-muted">Optional: French translation of the description</small>
             </div>
 
             <div className="mb-3">

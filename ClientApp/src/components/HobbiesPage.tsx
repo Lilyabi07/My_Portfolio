@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import api from '../api';
+import React from 'react';
 import Navigation from './Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useFetchData } from '../hooks';
 import { sortByDisplayOrder } from '../utils/formatters';
 import './HobbiesPage.css';
 
 interface Hobby {
   id: number;
   name: string;
+  nameFr?: string;
   icon?: string;
   description?: string;
+  descriptionFr?: string;
   displayOrder: number;
 }
 
@@ -19,33 +21,11 @@ interface HobbiesPageProps {
 }
 
 function HobbiesPage({ onAdminClick }: HobbiesPageProps) {
-  const [hobbies, setHobbies] = useState<Hobby[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: hobbiesRaw, loading, error } = useFetchData<Hobby>('/hobbies');
   const { theme } = useTheme();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
-  useEffect(() => {
-    fetchHobbies();
-  }, []);
-
-  const fetchHobbies = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await api.get('/hobbies');
-      if (Array.isArray(response.data)) {
-        setHobbies(sortByDisplayOrder(response.data));
-      } else {
-        setError(t('hobbies.invalidData'));
-      }
-    } catch (err) {
-      setError(t('hobbies.loadError'));
-      console.error('Error fetching hobbies:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const hobbies = sortByDisplayOrder(hobbiesRaw);
 
   return (
     <div className={`hobbies-page theme-${theme}`}>
@@ -78,21 +58,26 @@ function HobbiesPage({ onAdminClick }: HobbiesPageProps) {
             </div>
           ) : (
             <div className="hobbies-grid">
-              {hobbies.map((hobby) => (
-                <div key={hobby.id} className="hobby-card">
-                  <div className="hobby-icon">
-                    {hobby.icon ? (
-                      <i className={`fas ${hobby.icon}`}></i>
-                    ) : (
-                      <i className="fas fa-heart"></i>
+              {hobbies.map((hobby) => {
+                const displayName = language === 'fr' && hobby.nameFr ? hobby.nameFr : hobby.name;
+                const displayDescription = language === 'fr' && hobby.descriptionFr ? hobby.descriptionFr : hobby.description;
+                
+                return (
+                  <div key={hobby.id} className="hobby-card">
+                    <div className="hobby-icon">
+                      {hobby.icon ? (
+                        <i className={`fas ${hobby.icon}`}></i>
+                      ) : (
+                        <i className="fas fa-heart"></i>
+                      )}
+                    </div>
+                    <h3 className="hobby-name">{displayName}</h3>
+                    {displayDescription && (
+                      <p className="hobby-description">{displayDescription}</p>
                     )}
                   </div>
-                  <h3 className="hobby-name">{hobby.name}</h3>
-                  {hobby.description && (
-                    <p className="hobby-description">{hobby.description}</p>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
