@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MyPortfolio.Data;
@@ -30,8 +31,23 @@ builder.Services.AddScoped<IProfanityFilterService, ProfanityFilterService>();
 // Register RateLimitService (singleton for in-memory rate limiting)
 builder.Services.AddSingleton<IRateLimitService, RateLimitService>();
 
-// CORS: explicitly allow the React dev server origins and enable preflight/credentials if needed
-var allowedOrigins = new[] { "http://localhost:3000", "https://localhost:3000" };
+// Configure forwarded headers for proxy/load balancer (Render uses this)
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
+// CORS: allow dev server and production domain
+var allowedOrigins = builder.Environment.IsDevelopment()
+    ? new[] { "http://localhost:3000", "https://localhost:3000" }
+    : new[] { 
+        "http://localhost:3000", 
+        "https://localhost:3000",
+        "https://your-app-name.onrender.com" // Replace with your actual Render URL
+    };
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost", policy =>
@@ -72,6 +88,9 @@ builder.Services.AddSpaStaticFiles(configuration =>
 
 var app = builder.Build();
 
+// Use forwarded headers from proxy/load balancer
+app.UseForwardedHeaders();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -79,7 +98,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// Only redirect to HTTPS in production (Render handles SSL termination)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Serve static files from wwwroot (including uploads)
 app.UseStaticFiles();
