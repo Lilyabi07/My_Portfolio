@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import Navigation from './Navigation';
 import { useTheme } from '../contexts/ThemeContext';
@@ -32,9 +31,10 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [formLoadTime, setFormLoadTime] = useState(0); // Track when form loaded
-  const navigate = useNavigate();
   const { theme } = useTheme();
   const { t } = useLanguage();
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
   const [formData, setFormData] = useState({
     name: '',
     title: '',
@@ -88,6 +88,10 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
     }
   };
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [testimonials.length]);
+
   const renderStars = (rating?: number) => {
     if (!rating) return null;
     return (
@@ -100,6 +104,17 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
         ))}
       </div>
     );
+  };
+
+  const totalPages = Math.max(1, Math.ceil(testimonials.length / pageSize));
+  const paginatedTestimonials = testimonials.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const handlePageChange = (page: number) => {
+    const nextPage = Math.min(Math.max(page, 1), totalPages);
+    setCurrentPage(nextPage);
   };
 
   return (
@@ -183,10 +198,47 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
             />
           ) : (
             <div className="row g-4">
-              {testimonials.map((testimonial, index) => (
+              {paginatedTestimonials.map((testimonial, index) => (
                 <TestimonialCard key={testimonial.id} testimonial={testimonial} index={index} />
               ))}
             </div>
+          )}
+
+          {testimonials.length > 0 && totalPages > 1 && !loading && !error && (
+            <nav className="mt-5" aria-label={t('common.pagination') || 'Pagination'}>
+              <ul className="pagination justify-content-center">
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    aria-label={t('common.previous') || 'Previous'}
+                  >
+                    {t('common.previous') || 'Previous'}
+                  </button>
+                </li>
+
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                ))}
+
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    aria-label={t('common.next') || 'Next'}
+                  >
+                    {t('common.next') || 'Next'}
+                  </button>
+                </li>
+              </ul>
+            </nav>
           )}
         </div>
       </section>
