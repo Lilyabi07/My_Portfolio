@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using MyPortfolio.Data;
 using MyPortfolio.Hubs;
@@ -106,6 +107,17 @@ if (!app.Environment.IsDevelopment())
 
 // Serve static files from wwwroot (including uploads)
 app.UseStaticFiles();
+
+// Serve SPA static files from ClientApp/build
+if (Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "ClientApp", "build")))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), "ClientApp", "build")),
+        RequestPath = ""
+    });
+}
 
 // Serve SPA static files
 app.UseSpaStaticFiles();
