@@ -108,18 +108,7 @@ if (!app.Environment.IsDevelopment())
 // Serve static files from wwwroot (including uploads)
 app.UseStaticFiles();
 
-// Serve SPA static files from ClientApp/build
-if (Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "ClientApp", "build")))
-{
-    app.UseStaticFiles(new StaticFileOptions
-    {
-        FileProvider = new PhysicalFileProvider(
-            Path.Combine(Directory.GetCurrentDirectory(), "ClientApp", "build")),
-        RequestPath = ""
-    });
-}
-
-// Serve SPA static files
+// Serve SPA static files (CSS, JS, etc. from ClientApp/build)
 app.UseSpaStaticFiles();
 
 // Use CORS before endpoints that serve API
