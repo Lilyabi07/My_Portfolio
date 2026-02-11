@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: my-portfolio
+    runtime: dotnet
+    runtimeVersion: 8.0
+    buildCommand: dotnet publish -c Release -o out
+    startCommand: dotnet out/MyPortfolio.dll
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:${PORT}
