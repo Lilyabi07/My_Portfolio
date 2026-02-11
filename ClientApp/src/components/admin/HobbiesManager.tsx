@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { ConfirmationModal } from '../../components/common';
 import './HobbiesManager.css';
 
 interface Hobby {
@@ -27,6 +28,10 @@ function HobbiesManager() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    id: 0
+  });
   const { t } = useLanguage();
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
@@ -69,14 +74,18 @@ function HobbiesManager() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure?')) return;
+    setConfirmDialog({ isOpen: true, id });
+  };
 
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/hobbies/${id}`, authConfig);
+      await api.delete(`/hobbies/${confirmDialog.id}`, authConfig);
       setSuccess('Hobby deleted successfully!');
       fetchHobbies();
+      setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Delete failed');
+      setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
 
@@ -132,6 +141,17 @@ function HobbiesManager() {
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+
+      <ConfirmationModal
+        isOpen={confirmDialog.isOpen}
+        title="Delete Hobby"
+        message="Are you sure you want to delete this hobby? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
+      />
 
       <div className="row">
         <div className="col-md-6">

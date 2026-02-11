@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
+import { ConfirmationModal } from '../../components/common';
 import './TestimonialsManager.css';
 
 interface Testimonial {
@@ -19,6 +20,11 @@ function TestimonialsManager() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    id: 0,
+    action: 'delete'
+  });
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
   };
@@ -69,14 +75,18 @@ function TestimonialsManager() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure?')) return;
+    setConfirmDialog({ isOpen: true, id, action: 'delete' });
+  };
 
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/testimonials/${id}`, authConfig);
+      await api.delete(`/testimonials/${confirmDialog.id}`, authConfig);
       setSuccess('Testimonial deleted successfully!');
       fetchTestimonials();
+      setConfirmDialog({ isOpen: false, id: 0, action: 'delete' });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Delete failed');
+      setConfirmDialog({ isOpen: false, id: 0, action: 'delete' });
     }
   };
 
@@ -100,6 +110,17 @@ function TestimonialsManager() {
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+
+      <ConfirmationModal
+        isOpen={confirmDialog.isOpen}
+        title="Delete Testimonial"
+        message="Are you sure you want to delete this testimonial? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, id: 0, action: 'delete' })}
+      />
 
       <ul className="nav nav-tabs mb-4" role="tablist">
         <li className="nav-item" role="presentation">

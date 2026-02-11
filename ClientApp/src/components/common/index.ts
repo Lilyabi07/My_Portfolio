@@ -4,3 +4,4 @@
 export { LoadingSkeleton } from './LoadingSkeleton';
 export { EmptyState } from './EmptyState';
 export { PageTransition } from './PageTransition';
+export { default as ConfirmationModal } from './ConfirmationModal';

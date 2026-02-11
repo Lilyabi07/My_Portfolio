@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { ConfirmationModal } from '../../components/common';
 import './EducationManager.css';
 
 interface Education {
@@ -35,6 +36,10 @@ function EducationManager() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    id: 0
+  });
   const { t } = useLanguage();
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
@@ -77,14 +82,18 @@ function EducationManager() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure?')) return;
+    setConfirmDialog({ isOpen: true, id });
+  };
 
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/education/${id}`, authConfig);
+      await api.delete(`/education/${confirmDialog.id}`, authConfig);
       setSuccess('Education deleted successfully!');
       fetchEducations();
+      setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Delete failed');
+      setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
 
@@ -128,6 +137,17 @@ function EducationManager() {
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+
+      <ConfirmationModal
+        isOpen={confirmDialog.isOpen}
+        title="Delete Education"
+        message="Are you sure you want to delete this education entry? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
+      />
 
       <div className="row">
         <div className="col-md-6">
