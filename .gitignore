@@ -1,6 +1,8 @@
 # Uploads
 public/uploads/*
 !public/uploads/.gitkeep
+wwwroot/uploads/*
+!wwwroot/uploads/.gitkeep
 
 # Environment files
 .env
