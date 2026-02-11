@@ -1,0 +1,14 @@
+.git
+.vs
+.vscode
+bin
+obj
+**/bin
+**/obj
+ClientApp/node_modules
+ClientApp/dist
+ClientApp/build
+node_modules
+npm-debug.log*
+yarn-debug.log*
+*.md
