@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
+import { ConfirmationModal } from '../../components/common';
 import './TestimonialsManager.css';
 
 interface Testimonial {
@@ -17,18 +18,13 @@ interface Testimonial {
 function TestimonialsManager() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [formData, setFormData] = useState<Omit<Testimonial, 'id' | 'submittedDate'>>({
-    name: '',
-    title: '',
-    company: '',
-    message: '',
-    avatar: '',
-    rating: 5,
-    isPublished: false
-  });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    id: 0,
+    action: 'delete'
+  });
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
   };
@@ -54,19 +50,8 @@ function TestimonialsManager() {
     setError('');
     setSuccess('');
 
-    try {
-      if (editingId) {
-        await api.put(`/testimonials/${editingId}`, formData, authConfig);
-        setSuccess('Testimonial updated successfully!');
-      } else {
-        await api.post('/testimonials', formData, authConfig);
-        setSuccess('Testimonial added successfully!');
-      }
-      resetForm();
-      fetchTestimonials();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Operation failed');
-    }
+    // Edit functionality removed - testimonials can only be created via the public form
+    // This component is now for review/publish/unpublish/delete only
   };
 
   const handlePublish = async (id: number) => {
@@ -90,41 +75,28 @@ function TestimonialsManager() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure?')) return;
+    setConfirmDialog({ isOpen: true, id, action: 'delete' });
+  };
 
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/testimonials/${id}`, authConfig);
+      await api.delete(`/testimonials/${confirmDialog.id}`, authConfig);
       setSuccess('Testimonial deleted successfully!');
       fetchTestimonials();
+      setConfirmDialog({ isOpen: false, id: 0, action: 'delete' });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Delete failed');
+      setConfirmDialog({ isOpen: false, id: 0, action: 'delete' });
     }
   };
 
   const handleEdit = (testimonial: Testimonial) => {
-    setEditingId(testimonial.id);
-    setFormData({
-      name: testimonial.name,
-      title: testimonial.title,
-      company: testimonial.company,
-      message: testimonial.message,
-      avatar: testimonial.avatar || '',
-      rating: testimonial.rating || 5,
-      isPublished: testimonial.isPublished
-    });
+    // Edit functionality has been removed
+    // Testimonials can only be created via the public form
   };
 
   const resetForm = () => {
-    setEditingId(null);
-    setFormData({
-      name: '',
-      title: '',
-      company: '',
-      message: '',
-      avatar: '',
-      rating: 5,
-      isPublished: false
-    });
+    // Reset form functionality removed with edit capability
   };
 
   const pendingTestimonials = testimonials.filter(t => !t.isPublished);
@@ -138,6 +110,17 @@ function TestimonialsManager() {
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+
+      <ConfirmationModal
+        isOpen={confirmDialog.isOpen}
+        title="Delete Testimonial"
+        message="Are you sure you want to delete this testimonial? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, id: 0, action: 'delete' })}
+      />
 
       <ul className="nav nav-tabs mb-4" role="tablist">
         <li className="nav-item" role="presentation">
@@ -201,12 +184,6 @@ function TestimonialsManager() {
                       <i className="fas fa-check"></i> Approve & Publish
                     </button>
                     <button
-                      className="btn btn-sm btn-warning"
-                      onClick={() => handleEdit(testimonial)}
-                    >
-                      <i className="fas fa-edit"></i> Edit
-                    </button>
-                    <button
                       className="btn btn-sm btn-danger"
                       onClick={() => handleDelete(testimonial.id)}
                     >
@@ -253,12 +230,6 @@ function TestimonialsManager() {
                       <i className="fas fa-eye-slash"></i> Unpublish
                     </button>
                     <button
-                      className="btn btn-sm btn-info"
-                      onClick={() => handleEdit(testimonial)}
-                    >
-                      <i className="fas fa-edit"></i> Edit
-                    </button>
-                    <button
                       className="btn btn-sm btn-danger"
                       onClick={() => handleDelete(testimonial.id)}
                     >
@@ -271,92 +242,6 @@ function TestimonialsManager() {
           )}
         </div>
       </div>
-
-      {/* Edit Form */}
-      {editingId && (
-        <div className="edit-form-section">
-          <h4>Edit Testimonial</h4>
-          <form onSubmit={handleSubmit} className="testimonial-form">
-            <div className="mb-3">
-              <label className="form-label">Name</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Title</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Company</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={formData.company}
-                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Message</label>
-              <textarea
-                className="form-control"
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                rows={3}
-                required
-              />
-            </div>
-
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Rating</label>
-                <select
-                  className="form-select"
-                  value={formData.rating}
-                  onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) })}
-                >
-                  {[1, 2, 3, 4, 5].map(num => (
-                    <option key={num} value={num}>{num} Stars</option>
-                  ))}
-                </select>
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Avatar URL</label>
-                <input
-                  type="url"
-                  className="form-control"
-                  value={formData.avatar}
-                  onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div className="d-flex gap-2">
-              <button type="submit" className="btn btn-primary">
-                Update Testimonial
-              </button>
-              <button type="button" className="btn btn-secondary" onClick={resetForm}>
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
     </div>
   );
 }

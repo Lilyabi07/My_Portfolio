@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
+import { ConfirmationModal } from '../../components/common';
 import './SkillsManager.css';
 
 interface Skill {
@@ -22,6 +23,10 @@ function SkillsManager() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    id: 0
+  });
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
   };
@@ -63,14 +68,18 @@ function SkillsManager() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure?')) return;
+    setConfirmDialog({ isOpen: true, id });
+  };
 
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/skills/${id}`, authConfig);
+      await api.delete(`/skills/${confirmDialog.id}`, authConfig);
       setSuccess('Skill deleted successfully!');
       fetchSkills();
+      setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Delete failed');
+      setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
 
@@ -102,6 +111,17 @@ function SkillsManager() {
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+
+      <ConfirmationModal
+        isOpen={confirmDialog.isOpen}
+        title="Delete Skill"
+        message="Are you sure you want to delete this skill? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
+      />
 
       <div className="row">
         <div className="col-md-6">

@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { ConfirmationModal } from '../../components/common';
 import './EducationManager.css';
 
 interface Education {
   id: number;
   institution: string;
+  institutionFr?: string;
   degree: string;
+  degreeFr?: string;
   startDate: string;
   endDate?: string;
   isCurrent: boolean;
   description: string;
+  descriptionFr?: string;
   displayOrder: number;
 }
 
@@ -20,15 +24,22 @@ function EducationManager() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<Omit<Education, 'id'>>({
     institution: '',
+    institutionFr: '',
     degree: '',
+    degreeFr: '',
     startDate: new Date().toISOString().split('T')[0],
     endDate: undefined,
     isCurrent: false,
     description: '',
+    descriptionFr: '',
     displayOrder: 0
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    id: 0
+  });
   const { t } = useLanguage();
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
@@ -71,14 +82,18 @@ function EducationManager() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure?')) return;
+    setConfirmDialog({ isOpen: true, id });
+  };
 
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/education/${id}`, authConfig);
+      await api.delete(`/education/${confirmDialog.id}`, authConfig);
       setSuccess('Education deleted successfully!');
       fetchEducations();
+      setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Delete failed');
+      setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
 
@@ -86,11 +101,14 @@ function EducationManager() {
     setEditingId(education.id);
     setFormData({
       institution: education.institution,
+      institutionFr: education.institutionFr || '',
       degree: education.degree,
+      degreeFr: education.degreeFr || '',
       startDate: education.startDate.split('T')[0],
       endDate: education.endDate ? education.endDate.split('T')[0] : undefined,
       isCurrent: education.isCurrent,
       description: education.description,
+      descriptionFr: education.descriptionFr || '',
       displayOrder: education.displayOrder
     });
   };
@@ -99,11 +117,14 @@ function EducationManager() {
     setEditingId(null);
     setFormData({
       institution: '',
+      institutionFr: '',
       degree: '',
+      degreeFr: '',
       startDate: new Date().toISOString().split('T')[0],
       endDate: undefined,
       isCurrent: false,
       description: '',
+      descriptionFr: '',
       displayOrder: 0
     });
   };
@@ -116,6 +137,17 @@ function EducationManager() {
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+
+      <ConfirmationModal
+        isOpen={confirmDialog.isOpen}
+        title="Delete Education"
+        message="Are you sure you want to delete this education entry? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
+      />
 
       <div className="row">
         <div className="col-md-6">
@@ -135,6 +167,18 @@ function EducationManager() {
             </div>
 
             <div className="mb-3">
+              <label className="form-label">Degree/Certification (French)</label>
+              <input
+                type="text"
+                className="form-control"
+                value={formData.degreeFr}
+                onChange={(e) => setFormData({ ...formData, degreeFr: e.target.value })}
+                placeholder="e.g., Baccalauréat en sciences"
+              />
+              <small className="text-muted">Optional: French translation of the degree</small>
+            </div>
+
+            <div className="mb-3">
               <label className="form-label">Institution</label>
               <input
                 type="text"
@@ -144,6 +188,18 @@ function EducationManager() {
                 placeholder="e.g., University Name"
                 required
               />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Institution (French)</label>
+              <input
+                type="text"
+                className="form-control"
+                value={formData.institutionFr}
+                onChange={(e) => setFormData({ ...formData, institutionFr: e.target.value })}
+                placeholder="e.g., Nom de l'université"
+              />
+              <small className="text-muted">Optional: French translation of the institution name</small>
             </div>
 
             <div className="mb-3">
@@ -193,6 +249,18 @@ function EducationManager() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Additional details about your education..."
               />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Description (French)</label>
+              <textarea
+                className="form-control"
+                rows={3}
+                value={formData.descriptionFr}
+                onChange={(e) => setFormData({ ...formData, descriptionFr: e.target.value })}
+                placeholder="Détails supplémentaires sur votre éducation..."
+              />
+              <small className="text-muted">Optional: French translation of the description</small>
             </div>
 
             <div className="mb-3">

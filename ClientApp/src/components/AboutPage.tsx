@@ -22,11 +22,13 @@ function AboutPage({ onAdminClick }: AboutPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [cvUrl, setCvUrl] = useState<string | null>(null);
   const { theme } = useTheme();
   const { t } = useLanguage();
 
   useEffect(() => {
     fetchSkills();
+    fetchCvUrl();
   }, []);
 
   const fetchSkills = async () => {
@@ -47,6 +49,17 @@ function AboutPage({ onAdminClick }: AboutPageProps) {
     }
   };
 
+  const fetchCvUrl = async () => {
+    try {
+      const response = await api.get('/resume/cv-url');
+      if (response.data.cvUrl) {
+        setCvUrl(response.data.cvUrl);
+      }
+    } catch (err) {
+      console.error('Error fetching CV URL:', err);
+    }
+  };
+
   const skillsByCategory = skills.reduce((acc, skill) => {
     const category = skill.category || t('common.other');
     if (!acc[category]) {
@@ -64,6 +77,60 @@ function AboutPage({ onAdminClick }: AboutPageProps) {
         <div className="about-hero-content">
           <h1>{t('about.title')}</h1>
           <p>{t('about.subtitle')}</p>
+        </div>
+      </section>
+
+      {/* CV Download Section */}
+      <section className="cv-section">
+        <div className="container py-4">
+          {cvUrl ? (
+            <div className="cv-card">
+              <div className="cv-icon">
+                <i className="fas fa-file-pdf"></i>
+              </div>
+              <div className="cv-content">
+                <h3>{t('about.downloadCV')}</h3>
+                <p>{t('about.cvDescription')}</p>
+                <div className="cv-actions">
+                  <button
+                    className="btn btn-primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.open(`/api/resume/download-latest`, '_blank');
+                    }}
+                  >
+                    <i className="fas fa-eye me-2"></i>
+                    {t('about.viewCV')}
+                  </button>
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const link = document.createElement('a');
+                      link.href = `/api/resume/download-latest`;
+                      link.download = 'Bianca B. - CV.pdf';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    <i className="fas fa-download me-2"></i>
+                    {t('about.downloadButton')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="cv-card no-cv">
+              <div className="cv-icon">
+                <i className="fas fa-file-excel"></i>
+              </div>
+              <div className="cv-content">
+                <h3>{t('about.noCVAvailable')}</h3>
+                <p className="text-muted">The CV will be available soon. Please check back later.</p>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

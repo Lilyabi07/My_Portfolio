@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { ConfirmationModal } from '../../components/common';
 import './ContactMessagesManager.css';
 
 interface ContactMessage {
@@ -19,6 +20,10 @@ function ContactMessagesManager() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    id: 0
+  });
   const { t } = useLanguage();
 
   const authConfig = {
@@ -53,15 +58,19 @@ function ContactMessagesManager() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this message?')) return;
+    setConfirmDialog({ isOpen: true, id });
+  };
 
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/contact/messages/${id}`, authConfig);
+      await api.delete(`/contact/messages/${confirmDialog.id}`, authConfig);
       setSuccess('Message deleted successfully');
       fetchMessages();
       setSelectedMessage(null);
+      setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
       setError('Failed to delete message');
+      setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
 
@@ -105,6 +114,17 @@ function ContactMessagesManager() {
           <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={confirmDialog.isOpen}
+        title="Delete Message"
+        message="Are you sure you want to delete this message? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
+      />
 
       <div className="messages-header mb-3">
         <span className="badge bg-primary">{messages.length} Total</span>
@@ -188,7 +208,7 @@ function ContactMessagesManager() {
 
                 <div className="mb-3">
                   <label className="form-label text-muted">Message</label>
-                  <div className="message-content p-3 border rounded" style={{ backgroundColor: '#f8f9fa', minHeight: '150px' }}>
+                  <div className="message-content p-3 border rounded" style={{ minHeight: '150px' }}>
                     {selectedMessage.message}
                   </div>
                 </div>

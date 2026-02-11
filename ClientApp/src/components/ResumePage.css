@@ -418,3 +418,123 @@
     font-size: 1.1rem;
   }
 }
+
+/* Education Section Styles */
+.education-section {
+  background: #0a1929;
+  transition: all 0.4s ease-in-out;
+}
+
+.theme-light .education-section {
+  background: #f8f9fa;
+}
+
+.education-card {
+  background: rgba(30, 58, 95, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(102, 187, 255, 0.2);
+  border-radius: 12px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.theme-light .education-card {
+  background: #ffffff;
+  border: 1px solid #d0e1f9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.education-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(102, 187, 255, 0.2);
+}
+
+.theme-light .education-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.education-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.education-card .degree {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #66bbff;
+  margin-bottom: 0.5rem;
+}
+
+.theme-light .education-card .degree {
+  color: #2a6ee6;
+}
+
+.education-card .institution {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: rgba(245, 245, 245, 0.85);
+  margin-bottom: 0.5rem;
+}
+
+.theme-light .education-card .institution {
+  color: #5a6c7d;
+}
+
+.education-card .date-info {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.education-card .date-range {
+  font-size: 0.95rem;
+  color: rgba(184, 212, 241, 0.8);
+  display: inline-flex;
+  align-items: center;
+}
+
+.theme-light .education-card .date-range {
+  color: #7a8c9e;
+}
+
+.badge-current {
+  background: rgba(102, 187, 255, 0.2);
+  border: 1px solid #66bbff;
+  color: #66bbff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.theme-light .badge-current {
+  background: rgba(42, 110, 230, 0.1);
+  border-color: #2a6ee6;
+  color: #2a6ee6;
+}
+
+.badge-current i {
+  font-size: 0.6rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.education-card .description {
+  color: rgba(245, 245, 245, 0.75);
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+.theme-light .education-card .description {
+  color: #5a6c7d;
+}

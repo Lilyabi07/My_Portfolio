@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
+import { ConfirmationModal } from '../../components/common';
 import './ProjectsManager.css';
 
 interface Project {
   id: number;
   titleEn: string;
-  titleEs: string;
+  titleFr: string;
   descriptionEn: string;
-  descriptionEs: string;
+  descriptionFr: string;
   technologies: string;
   projectUrl: string;
   githubUrl: string;
@@ -19,11 +20,13 @@ function ProjectsManager() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
   const [formData, setFormData] = useState<Omit<Project, 'id'>>({
     titleEn: '',
-    titleEs: '',
+    titleFr: '',
     descriptionEn: '',
-    descriptionEs: '',
+    descriptionFr: '',
     technologies: '',
     projectUrl: '',
     githubUrl: '',
@@ -32,6 +35,10 @@ function ProjectsManager() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    id: 0
+  });
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
   };
@@ -52,17 +59,56 @@ function ProjectsManager() {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file is image
+      if (!file.type.startsWith('image/')) {
+        setError('Please select a valid image file');
+        return;
+      }
+      setImageFile(file);
+      // Show preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
     try {
+      let imageUrl = formData.imageUrl;
+
+      // Upload image if new file selected
+      if (imageFile) {
+        const formDataImage = new FormData();
+        formDataImage.append('file', imageFile);
+        
+        const uploadResponse = await api.post('/api/upload/project-image', formDataImage, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        imageUrl = uploadResponse.data.imageUrl;
+      }
+
+      const projectData = {
+        ...formData,
+        imageUrl
+      };
+
       if (editingId) {
-        await api.put(`/projects/${editingId}`, formData, authConfig);
+        await api.put(`/projects/${editingId}`, projectData, authConfig);
         setSuccess('Project updated successfully!');
       } else {
-        await api.post('/projects', formData, authConfig);
+        await api.post('/projects', projectData, authConfig);
         setSuccess('Project added successfully!');
       }
       resetForm();
@@ -73,14 +119,18 @@ function ProjectsManager() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure?')) return;
+    setConfirmDialog({ isOpen: true, id });
+  };
 
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/projects/${id}`, authConfig);
+      await api.delete(`/projects/${confirmDialog.id}`, authConfig);
       setSuccess('Project deleted successfully!');
       fetchProjects();
+      setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Delete failed');
+      setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
 
@@ -88,30 +138,34 @@ function ProjectsManager() {
     setEditingId(project.id);
     setFormData({
       titleEn: project.titleEn,
-      titleEs: project.titleEs,
+      titleFr: project.titleFr,
       descriptionEn: project.descriptionEn,
-      descriptionEs: project.descriptionEs,
+      descriptionFr: project.descriptionFr,
       technologies: project.technologies,
       projectUrl: project.projectUrl,
       githubUrl: project.githubUrl,
       imageUrl: project.imageUrl,
       displayOrder: project.displayOrder
     });
+    setImagePreview(project.imageUrl);
+    setImageFile(null);
   };
 
   const resetForm = () => {
     setEditingId(null);
     setFormData({
       titleEn: '',
-      titleEs: '',
+      titleFr: '',
       descriptionEn: '',
-      descriptionEs: '',
+      descriptionFr: '',
       technologies: '',
       projectUrl: '',
       githubUrl: '',
       imageUrl: '',
       displayOrder: 0
     });
+    setImageFile(null);
+    setImagePreview('');
   };
 
   if (loading) return <div className="text-center"><div className="spinner-border"></div></div>;
@@ -123,13 +177,24 @@ function ProjectsManager() {
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
+      <ConfirmationModal
+        isOpen={confirmDialog.isOpen}
+        title="Delete Project"
+        message="Are you sure you want to delete this project? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
+      />
+
       <div className="row">
         <div className="col-md-6">
           <form onSubmit={handleSubmit} className="project-form">
             <h4>{editingId ? 'Edit Project' : 'Add New Project'}</h4>
 
             <div className="mb-3">
-              <label className="form-label">Title (EN)</label>
+              <label className="form-label">Title (English) <span className="text-danger">*</span></label>
               <input
                 type="text"
                 className="form-control"
@@ -140,18 +205,18 @@ function ProjectsManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Title (ES)</label>
+              <label className="form-label">Title (Français) <span className="text-danger">*</span></label>
               <input
                 type="text"
                 className="form-control"
-                value={formData.titleEs}
-                onChange={(e) => setFormData({ ...formData, titleEs: e.target.value })}
+                value={formData.titleFr}
+                onChange={(e) => setFormData({ ...formData, titleFr: e.target.value })}
                 required
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Description (EN)</label>
+              <label className="form-label">Description (English) <span className="text-danger">*</span></label>
               <textarea
                 className="form-control"
                 value={formData.descriptionEn}
@@ -162,11 +227,11 @@ function ProjectsManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Description (ES)</label>
+              <label className="form-label">Description (Français) <span className="text-danger">*</span></label>
               <textarea
                 className="form-control"
-                value={formData.descriptionEs}
-                onChange={(e) => setFormData({ ...formData, descriptionEs: e.target.value })}
+                value={formData.descriptionFr}
+                onChange={(e) => setFormData({ ...formData, descriptionFr: e.target.value })}
                 rows={3}
                 required
               />
@@ -204,13 +269,18 @@ function ProjectsManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Image URL</label>
+              <label className="form-label">Project Image (JPEG, PNG, etc.)</label>
               <input
-                type="url"
+                type="file"
                 className="form-control"
-                value={formData.imageUrl}
-                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                accept="image/*"
+                onChange={handleImageChange}
               />
+              {imagePreview && (
+                <div className="mt-2">
+                  <img src={imagePreview} alt="Preview" style={{ maxWidth: '200px', maxHeight: '150px', borderRadius: '8px' }} />
+                </div>
+              )}
             </div>
 
             <div className="mb-3">
@@ -245,7 +315,7 @@ function ProjectsManager() {
                   <img src={project.imageUrl} alt={project.titleEn} className="project-image" />
                 )}
                 <div className="project-info">
-                  <h5>{project.titleEn}</h5>
+                  <h5>{project.titleEn} / {project.titleFr}</h5>
                   <p className="text-muted small">{project.technologies}</p>
                   <div className="project-actions">
                     <button

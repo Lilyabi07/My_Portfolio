@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { ConfirmationModal } from '../../components/common';
 import './HobbiesManager.css';
 
 interface Hobby {
   id: number;
   name: string;
+  nameFr?: string;
   icon?: string;
   description?: string;
+  descriptionFr?: string;
   displayOrder: number;
 }
 
@@ -17,12 +20,18 @@ function HobbiesManager() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<Omit<Hobby, 'id'>>({
     name: '',
+    nameFr: '',
     icon: '',
     description: '',
+    descriptionFr: '',
     displayOrder: 0
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    id: 0
+  });
   const { t } = useLanguage();
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
@@ -65,14 +74,18 @@ function HobbiesManager() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure?')) return;
+    setConfirmDialog({ isOpen: true, id });
+  };
 
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/hobbies/${id}`, authConfig);
+      await api.delete(`/hobbies/${confirmDialog.id}`, authConfig);
       setSuccess('Hobby deleted successfully!');
       fetchHobbies();
+      setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Delete failed');
+      setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
 
@@ -80,8 +93,10 @@ function HobbiesManager() {
     setEditingId(hobby.id);
     setFormData({
       name: hobby.name,
+      nameFr: hobby.nameFr || '',
       icon: hobby.icon || '',
       description: hobby.description || '',
+      descriptionFr: hobby.descriptionFr || '',
       displayOrder: hobby.displayOrder
     });
   };
@@ -90,8 +105,10 @@ function HobbiesManager() {
     setEditingId(null);
     setFormData({
       name: '',
+      nameFr: '',
       icon: '',
       description: '',
+      descriptionFr: '',
       displayOrder: 0
     });
   };
@@ -125,6 +142,17 @@ function HobbiesManager() {
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
+      <ConfirmationModal
+        isOpen={confirmDialog.isOpen}
+        title="Delete Hobby"
+        message="Are you sure you want to delete this hobby? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
+      />
+
       <div className="row">
         <div className="col-md-6">
           <form onSubmit={handleSubmit} className="hobbies-form">
@@ -140,6 +168,18 @@ function HobbiesManager() {
                 placeholder="e.g., Photography, Reading, Gaming"
                 required
               />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Hobby Name (French)</label>
+              <input
+                type="text"
+                className="form-control"
+                value={formData.nameFr}
+                onChange={(e) => setFormData({ ...formData, nameFr: e.target.value })}
+                placeholder="e.g., Photographie, Lecture, Jeux vidéo"
+              />
+              <small className="text-muted">Optional: French translation of the hobby name</small>
             </div>
 
             <div className="mb-3">
@@ -186,6 +226,18 @@ function HobbiesManager() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Tell us more about this hobby..."
               />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Description (French)</label>
+              <textarea
+                className="form-control"
+                rows={3}
+                value={formData.descriptionFr}
+                onChange={(e) => setFormData({ ...formData, descriptionFr: e.target.value })}
+                placeholder="Parlez-nous de ce loisir..."
+              />
+              <small className="text-muted">Optional: French translation of the description</small>
             </div>
 
             <div className="mb-3">

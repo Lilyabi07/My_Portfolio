@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { ConfirmationModal } from '../../components/common';
 import './ResumeManager.css';
 
 interface Resume {
@@ -19,6 +20,10 @@ function ResumeManager() {
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    id: 0
+  });
   const { t } = useLanguage();
   
   const authConfig = {
@@ -109,14 +114,18 @@ function ResumeManager() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this CV? This action cannot be undone.')) return;
+    setConfirmDialog({ isOpen: true, id });
+  };
 
+  const confirmDelete = async () => {
     try {
-      await api.delete(`/resume/${id}`, authConfig);
+      await api.delete(`/resume/${confirmDialog.id}`, authConfig);
       setSuccess('CV deleted successfully!');
       fetchResumes();
+      setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Delete failed');
+      setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
 
@@ -164,6 +173,17 @@ function ResumeManager() {
         {success}
         <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
       </div>}
+
+      <ConfirmationModal
+        isOpen={confirmDialog.isOpen}
+        title="Delete Resume"
+        message="Are you sure you want to delete this CV? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
+      />
 
       <div className="row">
         {/* Upload Section */}

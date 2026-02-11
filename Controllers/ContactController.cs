@@ -141,25 +141,17 @@ namespace MyPortfolio.Controllers
                 return BadRequest(new { message = "All fields are required." });
             }
 
-            // Get client IP for rate limiting
-            var clientIp = RateLimitService.GetClientIdentifier(HttpContext);
-
             // Rate limit: 5 messages per IP per 1 hour
-            var rateLimitResult = await _rateLimitService.CheckRateLimitAsync(
-                clientIp, 
-                "contact_form", 
-                TimeSpan.FromHours(1), 
-                5);
+            var rateLimitError = await _rateLimitService.ValidateRateLimitAsync(
+                HttpContext,
+                "contact_form",
+                TimeSpan.FromHours(1),
+                5,
+                _logger,
+                $"Too many messages. Please try again in {{seconds}} seconds.");
 
-            if (!rateLimitResult.allowed)
-            {
-                var retrySeconds = (int)rateLimitResult.retryAfter.TotalSeconds;
-                _logger.LogWarning($"Contact form rate limit exceeded for IP: {clientIp}. Retry after: {retrySeconds}s");
-                return StatusCode(429, new { 
-                    message = $"Too many messages. Please try again in {retrySeconds} seconds.",
-                    retryAfter = retrySeconds
-                });
-            }
+            if (rateLimitError != null)
+                return rateLimitError;
 
             // Check for profanity in message and name
             var combinedText = $"{message.Name} {message.Message}";
@@ -181,12 +173,12 @@ namespace MyPortfolio.Controllers
 
                 // Send email notification to admin
                 await _emailService.SendContactEmailAsync(message.Name, message.Email, message.Message);
+                var clientIp = RateLimitService.GetClientIdentifier(HttpContext);
                 _logger.LogInformation($"Contact form submission processed - Name: {message.Name}, Email: {message.Email}, IP: {clientIp}");
 
                 return Ok(new { 
                     success = true, 
-                    message = "Message sent successfully!",
-                    remaining = rateLimitResult.remaining
+                    message = "Message sent successfully!"
                 });
             }
             catch (Exception ex)
