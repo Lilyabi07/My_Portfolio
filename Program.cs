@@ -46,7 +46,7 @@ var allowedOrigins = builder.Environment.IsDevelopment()
     : new[] { 
         "http://localhost:3000", 
         "https://localhost:3000",
-        "https://your-app-name.onrender.com" // Replace with your actual Render URL
+        "https://all-about-b-d3azb7bjajhsc3b6.canadacentral-01.azurewebsites.net"
     };
 
 builder.Services.AddCors(options =>
