@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { setAuthToken } from './api';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { PageTransition } from './components/common/PageTransition';
 import Login from './components/Login';
@@ -21,6 +21,7 @@ function AppContent() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adminUsername, setAdminUsername] = useState('');
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -47,7 +48,7 @@ function AppContent() {
   };
 
   return (
-    <div className="App">
+    <div className={`App theme-${theme}`}>
       <Routes>
         {/* Admin Routes */}
         <Route path="/admin/login" element={<PageTransition><Login onLoginSuccess={handleLoginSuccess} /></PageTransition>} />
