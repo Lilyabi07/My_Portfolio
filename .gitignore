@@ -9,6 +9,8 @@ public/uploads/*
 # IDE files
 .vscode/
 .idea/
+.vs/
+.vscode/*
 *.swp
 *.swo
 *~
@@ -48,6 +50,8 @@ wwwroot/lib/
 node_modules/
 npm-debug.log*
 yarn-debug.log*
+package-lock.json
+yarn.lock
 yarn-error.log*
 ClientApp/build/
 .env.local
