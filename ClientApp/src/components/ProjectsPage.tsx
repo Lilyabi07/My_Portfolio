@@ -8,12 +8,15 @@ import './ProjectsPage.css';
 
 interface Project {
   id: number;
-  title: string;
-  description: string;
-  technologies?: string[];
+  titleEn: string;
+  titleFr: string;
+  descriptionEn: string;
+  descriptionFr: string;
+  technologies: string;
   imageUrl?: string;
-  link?: string;
-  github?: string;
+  projectUrl?: string;
+  githubUrl?: string;
+  displayOrder: number;
 }
 
 interface ProjectsPageProps {
@@ -24,7 +27,7 @@ function ProjectsPage({ onAdminClick }: ProjectsPageProps) {
   const { data: projects, loading, error } = useFetchData<Project>('/projects');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { theme } = useTheme();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <div className={`projects-page theme-${theme}`}>
@@ -80,7 +83,7 @@ function ProjectsPage({ onAdminClick }: ProjectsPageProps) {
           <div className="modal-dialog modal-dialog-centered modal-lg" onClick={(e) => e.stopPropagation()}>
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">{selectedProject.title}</h5>
+                <h5 className="modal-title">{language === 'fr' ? selectedProject.titleFr : selectedProject.titleEn}</h5>
                 <button 
                   type="button" 
                   className="btn-close" 
@@ -92,20 +95,20 @@ function ProjectsPage({ onAdminClick }: ProjectsPageProps) {
                 {selectedProject.imageUrl && (
                   <img 
                     src={selectedProject.imageUrl} 
-                    alt={selectedProject.title} 
+                    alt={language === 'fr' ? selectedProject.titleFr : selectedProject.titleEn} 
                     className="img-fluid mb-3 rounded"
                   />
                 )}
                 <h6>{t('projects.description')}</h6>
-                <p>{selectedProject.description}</p>
+                <p>{language === 'fr' ? selectedProject.descriptionFr : selectedProject.descriptionEn}</p>
                 
-                {Array.isArray(selectedProject.technologies) && selectedProject.technologies.length > 0 && (
+                {selectedProject.technologies && (
                   <>
                     <h6 className="mt-3">{t('projects.technologies')}</h6>
                     <div className="d-flex flex-wrap gap-2">
-                      {selectedProject.technologies.map((tech, idx) => (
+                      {selectedProject.technologies.split(',').map((tech, idx) => (
                         <span key={idx} className="badge bg-primary">
-                          {tech}
+                          {tech.trim()}
                         </span>
                       ))}
                     </div>
@@ -113,9 +116,9 @@ function ProjectsPage({ onAdminClick }: ProjectsPageProps) {
                 )}
                 
                 <div className="mt-4 d-flex gap-2">
-                  {selectedProject.link && (
+                  {selectedProject.projectUrl && (
                     <a 
-                      href={selectedProject.link} 
+                      href={selectedProject.projectUrl} 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="btn btn-primary"
@@ -124,9 +127,9 @@ function ProjectsPage({ onAdminClick }: ProjectsPageProps) {
                       {t('projects.viewDemo')}
                     </a>
                   )}
-                  {selectedProject.github && (
+                  {selectedProject.githubUrl && (
                     <a 
-                      href={selectedProject.github} 
+                      href={selectedProject.githubUrl} 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="btn btn-dark"
@@ -154,26 +157,30 @@ interface ProjectCardProps {
 
 function ProjectCard({ project, index, onSelect }: ProjectCardProps) {
   const scrollRef = useScrollAnimation({ threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  
+  const title = language === 'fr' ? project.titleFr : project.titleEn;
+  const description = language === 'fr' ? project.descriptionFr : project.descriptionEn;
+  const techArray = project.technologies ? project.technologies.split(',').map(t => t.trim()) : [];
 
   return (
     <div ref={scrollRef} className="col-md-6 col-lg-4">
       <div className="project-card" onClick={() => onSelect(project)} style={{ cursor: 'pointer' }}>
         {project.imageUrl && (
           <div className="project-image">
-            <img src={project.imageUrl} alt={project.title} />
+            <img src={project.imageUrl} alt={title} />
           </div>
         )}
         <div className="project-content">
-          <h3 className="project-title">{project.title}</h3>
+          <h3 className="project-title">{title}</h3>
           <p className="project-description">
-            {project.description.length > 100 
-              ? `${project.description.substring(0, 100)}...` 
-              : project.description}
+            {description.length > 100 
+              ? `${description.substring(0, 100)}...` 
+              : description}
           </p>
-          {Array.isArray(project.technologies) && project.technologies.length > 0 && (
+          {techArray.length > 0 && (
             <div className="project-tech">
-              {project.technologies.map((tech, idx) => (
+              {techArray.map((tech, idx) => (
                 <span key={idx} className="tech-badge">
                   {tech}
                 </span>
@@ -181,13 +188,13 @@ function ProjectCard({ project, index, onSelect }: ProjectCardProps) {
             </div>
           )}
           <div className="project-links">
-            {project.link && (
-              <a href={project.link} target="_blank" rel="noopener noreferrer" className="btn-link">
+            {project.projectUrl && (
+              <a href={project.projectUrl} target="_blank" rel="noopener noreferrer" className="btn-link">
                 {t('projects.viewDemo')}
               </a>
             )}
-            {project.github && (
-              <a href={project.github} target="_blank" rel="noopener noreferrer" className="btn-link">
+            {project.githubUrl && (
+              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="btn-link">
                 {t('projects.sourceCode')}
               </a>
             )}

@@ -12,8 +12,8 @@ using MyPortfolio.Data;
 namespace MyPortfolio.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260212162212_FixProjectsSchema")]
-    partial class FixProjectsSchema
+    [Migration("20260212165439_FixProjectsSchemaSimple")]
+    partial class FixProjectsSchemaSimple
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
