@@ -18,7 +18,7 @@ namespace MyPortfolio.Migrations
             migrationBuilder.RenameColumn(
                 name: "Description",
                 table: "Projects",
-                newName: "TitleEn");
+                newName: "DescriptionFr");
 
             migrationBuilder.AddColumn<string>(
                 name: "DescriptionEn",
@@ -52,7 +52,7 @@ namespace MyPortfolio.Migrations
                 newName: "Title");
 
             migrationBuilder.RenameColumn(
-                name: "TitleEn",
+                name: "DescriptionFr",
                 table: "Projects",
                 newName: "Description");
         }
