@@ -125,26 +125,16 @@ app.MapControllers();
 // Map SignalR hub
 app.MapHub<NotificationsHub>("/hubs/notifications");
 
-// Keep conventional route for MVC views if any
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// Configure SPA - but DON'T proxy API routes or static file uploads
-app.MapWhen(context => 
-    !context.Request.Path.StartsWithSegments("/api") && 
-    !context.Request.Path.StartsWithSegments("/uploads"), 
-    spaApp =>
+// Configure SPA - serve for all non-API, non-upload routes
+app.UseSpa(spa =>
 {
-    spaApp.UseSpa(spa =>
-    {
-        spa.Options.SourcePath = "ClientApp";
+    spa.Options.SourcePath = "ClientApp";
+    spa.Options.DefaultPage = "/index.html";
 
-        if (app.Environment.IsDevelopment())
-        {
-            spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
-        }
-    });
+    if (app.Environment.IsDevelopment())
+    {
+        spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+    }
 });
 
 app.Run();
