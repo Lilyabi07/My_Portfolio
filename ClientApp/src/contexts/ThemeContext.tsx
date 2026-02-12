@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Theme = 'dark' | 'light';
 
@@ -14,6 +14,12 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const saved = localStorage.getItem('theme');
     return (saved as Theme) || 'dark';
   });
+
+  // Apply theme to document root whenever it changes
+  useEffect(() => {
+    document.documentElement.classList.remove('theme-dark', 'theme-light');
+    document.documentElement.classList.add(`theme-${theme}`);
+  }, [theme]);
 
   const toggleTheme = () => {
     setTheme((prevTheme) => {
