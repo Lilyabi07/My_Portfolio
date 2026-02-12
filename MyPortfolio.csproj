@@ -22,4 +22,10 @@
     <Content Include="ClientApp\build\**" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!-- Auto-build React app before .NET publish -->
+  <Target Name="BuildClientApp" BeforeTargets="Publish">
+    <Exec WorkingDirectory="ClientApp" Command="npm install" />
+    <Exec WorkingDirectory="ClientApp" Command="npm run build" />
+  </Target>
+
 </Project>
