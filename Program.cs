@@ -119,11 +119,14 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map attribute routed API controllers
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    // Map attribute routed API controllers
+    endpoints.MapControllers();
 
-// Map SignalR hub
-app.MapHub<NotificationsHub>("/hubs/notifications");
+    // Map SignalR hub
+    endpoints.MapHub<NotificationsHub>("/hubs/notifications");
+});
 
 // Configure SPA - serve for all non-API, non-upload routes
 app.UseSpa(spa =>
