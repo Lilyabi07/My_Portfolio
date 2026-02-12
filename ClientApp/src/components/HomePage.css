@@ -228,7 +228,7 @@
   text-align: center;
   font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 3rem;
+  margin-bottom: 4.5rem;
   color: #66bbff;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -254,16 +254,17 @@
 }
 
 .highlight-card {
-  background: rgba(30, 58, 95, 0.4);
+  background: rgba(30, 58, 95, 0.8) !important;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(102, 187, 255, 0.2);
+  border: 2px solid rgba(102, 187, 255, 0.5) !important;
   border-radius: 20px;
   padding: 2.5rem;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   height: 100%;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
 }
 
 .home-page.theme-light .highlight-card {
