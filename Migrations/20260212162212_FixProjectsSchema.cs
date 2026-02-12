@@ -36,8 +36,7 @@ namespace MyPortfolio.Migrations
             migrationBuilder.RenameColumn(
                 name: "TitleEn_Correct",
                 table: "Projects",
-                newName: "TitleEn",
-                oldTable: "Projects");
+                newName: "TitleEn");
         }
 
         /// <inheritdoc />
@@ -47,8 +46,7 @@ namespace MyPortfolio.Migrations
             migrationBuilder.RenameColumn(
                 name: "TitleEn",
                 table: "Projects",
-                newName: "TitleEn_Correct",
-                oldTable: "Projects");
+                newName: "TitleEn_Correct");
 
             migrationBuilder.AddColumn<string>(
                 name: "TitleEn",
