@@ -19,5 +19,15 @@ namespace MyPortfolio.Data
         public DbSet<Resume> Resumes { get; set; } = null!;
         public DbSet<ContactInformation> ContactInformation { get; set; } = null!;
         public DbSet<ContactMessage> ContactMessages { get; set; } = null!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Map DbSet names to actual table names in the database
+            modelBuilder.Entity<Education>().ToTable("Educations");
+            modelBuilder.Entity<ContactInformation>().ToTable("ContactInformation");
+            modelBuilder.Entity<ContactMessage>().ToTable("ContactMessages");
+        }
     }
 }
