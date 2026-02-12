@@ -1,5 +1,6 @@
 .navbar {
   background: rgba(10, 25, 41, 0.95) !important;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   padding: 1rem 0;
