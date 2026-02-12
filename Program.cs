@@ -7,6 +7,7 @@ using MyPortfolio.Data;
 using MyPortfolio.Hubs;
 using MyPortfolio.Services;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -88,6 +89,21 @@ builder.Services.AddSpaStaticFiles(configuration =>
 });
 
 var app = builder.Build();
+
+// Apply pending migrations automatically on startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    try
+    {
+        db.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        // Log migration errors but don't crash the app
+        Console.WriteLine($"Migration error: {ex.Message}");
+    }
+}
 
 // Use forwarded headers from proxy/load balancer
 app.UseForwardedHeaders();
