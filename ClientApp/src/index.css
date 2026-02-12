@@ -42,10 +42,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Global border styles for cards and containers */
-.card,
-.section-box,
-.container-fluid,
-.content-section {
+.card {
   border: 1px solid var(--border-color);
   border-radius: 8px;
 }
@@ -55,36 +52,9 @@ button, input, textarea, select {
   font-family: inherit;
 }
 
-/* Bootstrap component overrides for theming */
-html.theme-dark .card,
-html.theme-light .card {
+/* Minimal Bootstrap overrides - let component styles handle specifics */
+.card {
   background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border-color: var(--border-color);
-}
-
-html.theme-dark .navbar,
-html.theme-light .navbar {
-  background-color: var(--bg-secondary) !important;
-  border-color: var(--border-color) !important;
-}
-
-html.theme-dark .navbar .navbar-brand,
-html.theme-dark .navbar .nav-link,
-html.theme-light .navbar .navbar-brand,
-html.theme-light .navbar .nav-link {
-  color: var(--text-primary) !important;
-}
-
-html.theme-dark .btn,
-html.theme-light .btn {
-  color: var(--text-primary);
-}
-
-html.theme-dark .btn-primary,
-html.theme-light .btn-primary {
-  background-color: var(--bg-secondary);
-  border-color: var(--border-color);
   color: var(--text-primary);
 }
 
