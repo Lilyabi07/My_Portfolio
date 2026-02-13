@@ -112,6 +112,7 @@ function ContactPage({ onAdminClick }: ContactPageProps) {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
+                      maxLength={100}
                       placeholder={t('contact.placeholders.name')}
                     />
                   </div>
@@ -125,6 +126,7 @@ function ContactPage({ onAdminClick }: ContactPageProps) {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       required
+                      maxLength={50}
                       placeholder={t('contact.placeholders.email')}
                     />
                   </div>
@@ -138,6 +140,7 @@ function ContactPage({ onAdminClick }: ContactPageProps) {
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       required
+                      maxLength={500}
                       placeholder={t('contact.placeholders.message')}
                     ></textarea>
                   </div>

@@ -248,8 +248,8 @@ function WorkExperienceManager() {
               <div key={exp.id} className="timeline-item">
                 <div className="timeline-marker"></div>
                 <div className="timeline-content">
-                  <h5>{exp.positionEn}</h5>
-                  <p className="company">{exp.companyEn}</p>
+                  <h5>{exp.position}</h5>
+                  <p className="company">{exp.company}</p>
                   <p className="dates">
                     {new Date(exp.startDate).toLocaleDateString()} - {' '}
                     {exp.isCurrent ? <span className="badge bg-success">{language === 'en' ? 'Current' : 'Actuel'}</span> : new Date(exp.endDate).toLocaleDateString()}
