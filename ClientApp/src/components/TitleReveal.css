@@ -6,7 +6,7 @@
 
 .title-reveal-text {
   display: inline-block;
-  opacity: 0;
+  opacity: 1;
   transform: translateY(10px);
 }
 
@@ -20,6 +20,14 @@
     transform: translateY(10px);
   }
   100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile Safari fix - ensure fallback visibility */
+@media (max-width: 768px) {
+  .title-reveal-text {
     opacity: 1;
     transform: translateY(0);
   }

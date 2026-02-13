@@ -88,6 +88,7 @@
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
+  color: #66bbff;
   animation: glow 3s ease-in-out infinite;
   letter-spacing: -2px;
   min-height: 5rem;
@@ -96,12 +97,36 @@
   justify-content: center;
 }
 
+/* Mobile Safari fix - simplify rendering */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+    min-height: auto;
+    animation: glow-mobile 3s ease-in-out infinite;
+    /* Fallback for Safari mobile */
+    color: #66bbff !important;
+  }
+}
+
+@keyframes glow-mobile {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 15px rgba(102, 187, 255, 0.3)); }
+  50% { filter: brightness(1.1) drop-shadow(0 0 20px rgba(102, 187, 255, 0.4)); }
+}
+
 .home-page.theme-light .hero-title {
   background: linear-gradient(135deg, #2a6ee6 0%, #4a8eff 50%, #1e3a5f 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
+  color: #2a6ee6;
   filter: drop-shadow(0 2px 4px rgba(42, 110, 230, 0.2));
+}
+
+/* Mobile Safari fix for light theme */
+@media (max-width: 768px) {
+  .home-page.theme-light .hero-title {
+    color: #2a6ee6 !important;
+  }
 }
 
 @keyframes glow {
