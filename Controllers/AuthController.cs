@@ -11,8 +11,6 @@ namespace MyPortfolio.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private const string DefaultUsername = "admin";
-        private const string DefaultPassword = "admin123admin";
 
         public AuthController(IConfiguration configuration)
         {
@@ -22,7 +20,11 @@ namespace MyPortfolio.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            if (request?.Username == DefaultUsername && request?.Password == DefaultPassword)
+            // Load credentials from configuration
+            var adminUsername = _configuration["Admin:Username"];
+            var adminPassword = _configuration["Admin:Password"];
+
+            if (request?.Username == adminUsername && request?.Password == adminPassword)
             {
                 var token = GenerateJwtToken(request.Username);
                 return Ok(new { success = true, token, message = "Login successful" });

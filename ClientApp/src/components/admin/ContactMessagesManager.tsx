@@ -24,7 +24,7 @@ function ContactMessagesManager() {
     isOpen: false,
     id: 0
   });
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
@@ -40,7 +40,7 @@ function ContactMessagesManager() {
       const response = await api.get('/contact/messages', authConfig);
       setMessages(response.data);
     } catch (err: any) {
-      setError('Failed to load messages');
+      setError(language === 'en' ? 'Failed to load messages' : 'Échec du chargement des messages');
     } finally {
       setLoading(false);
     }
@@ -49,11 +49,11 @@ function ContactMessagesManager() {
   const handleMarkAsRead = async (id: number) => {
     try {
       await api.put(`/contact/messages/${id}/mark-read`, {}, authConfig);
-      setSuccess('Message marked as read');
+      setSuccess(language === 'en' ? 'Message marked as read' : 'Message marqué comme lu');
       fetchMessages();
       setSelectedMessage(null);
     } catch (err: any) {
-      setError('Failed to mark message as read');
+      setError(language === 'en' ? 'Failed to mark message as read' : 'Échec du marquage du message comme lu');
     }
   };
 
@@ -64,12 +64,12 @@ function ContactMessagesManager() {
   const confirmDelete = async () => {
     try {
       await api.delete(`/contact/messages/${confirmDialog.id}`, authConfig);
-      setSuccess('Message deleted successfully');
+      setSuccess(language === 'en' ? 'Message deleted successfully' : 'Message supprimé avec succès');
       fetchMessages();
       setSelectedMessage(null);
       setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
-      setError('Failed to delete message');
+      setError(language === 'en' ? 'Failed to delete message' : 'Échec de la suppression du message');
       setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
@@ -99,7 +99,7 @@ function ContactMessagesManager() {
 
   return (
     <div className="contact-messages-manager">
-      <h2><i className="fas fa-envelope"></i> Contact Messages</h2>
+      <h2><i className="fas fa-envelope"></i> {t('admin.tabs.messages')} - {t('admin.manageSections')}</h2>
 
       {error && (
         <div className="alert alert-danger alert-dismissible fade show" role="alert">
@@ -117,18 +117,18 @@ function ContactMessagesManager() {
 
       <ConfirmationModal
         isOpen={confirmDialog.isOpen}
-        title="Delete Message"
-        message="Are you sure you want to delete this message? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={language === 'en' ? 'Delete Message' : 'Supprimer le message'}
+        message={language === 'en' ? 'Are you sure you want to delete this message? This action cannot be undone.' : 'Êtes-vous sûr de vouloir supprimer ce message? Cette action ne peut pas être annulée.'}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         isDangerous={true}
         onConfirm={confirmDelete}
         onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
       />
 
       <div className="messages-header mb-3">
-        <span className="badge bg-primary">{messages.length} Total</span>
-        {unreadCount > 0 && <span className="badge bg-warning ms-2">{unreadCount} Unread</span>}
+        <span className="badge bg-primary">{messages.length} {language === 'en' ? 'Total' : 'Au total'}</span>
+        {unreadCount > 0 && <span className="badge bg-warning ms-2">{unreadCount} {language === 'en' ? 'Unread' : 'Non lus'}</span>}
       </div>
 
       <div className="row">
@@ -136,13 +136,13 @@ function ContactMessagesManager() {
         <div className="col-lg-6">
           <div className="card">
             <div className="card-header">
-              <h5 className="mb-0"><i className="fas fa-inbox"></i> Messages ({messages.length})</h5>
+                <h5 className="mb-0"><i className="fas fa-inbox"></i> {language === 'en' ? 'Messages' : 'Messages'} ({messages.length})</h5>
             </div>
             <div className="card-body p-0">
               {messages.length === 0 ? (
                 <div className="text-center text-muted py-5">
                   <i className="fas fa-inbox fa-3x mb-3"></i>
-                  <p>No messages yet</p>
+                  <p>{language === 'en' ? 'No messages yet' : 'Aucun message pour le moment'}</p>
                 </div>
               ) : (
                 <div className="messages-list">
@@ -180,7 +180,7 @@ function ContactMessagesManager() {
             <div className="card">
               <div className="card-header">
                 <div className="d-flex justify-content-between align-items-center">
-                  <h5 className="mb-0"><i className="fas fa-envelope-open"></i> Message Details</h5>
+                  <h5 className="mb-0"><i className="fas fa-envelope-open"></i> {language === 'en' ? 'Message Details' : 'Détails du message'}</h5>
                   <button
                     className="btn-close"
                     onClick={() => setSelectedMessage(null)}
@@ -189,25 +189,25 @@ function ContactMessagesManager() {
               </div>
               <div className="card-body">
                 <div className="mb-3">
-                  <label className="form-label text-muted">From</label>
+                  <label className="form-label text-muted">{language === 'en' ? 'From' : 'De'}</label>
                   <p className="mb-0"><strong>{selectedMessage.name}</strong></p>
                   <p className="mb-3"><a href={`mailto:${selectedMessage.email}`}>{selectedMessage.email}</a></p>
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label text-muted">Date Received</label>
+                  <label className="form-label text-muted">{language === 'en' ? 'Date Received' : 'Date de réception'}</label>
                   <p className="mb-3">{formatDate(selectedMessage.submittedAt)}</p>
                 </div>
 
                 {selectedMessage.isRead && selectedMessage.readAt && (
                   <div className="mb-3">
-                    <label className="form-label text-muted">Marked as Read</label>
+                    <label className="form-label text-muted">{language === 'en' ? 'Marked as Read' : 'Marqué comme lu'}</label>
                     <p className="mb-3">{formatDate(selectedMessage.readAt)}</p>
                   </div>
                 )}
 
                 <div className="mb-3">
-                  <label className="form-label text-muted">Message</label>
+                  <label className="form-label text-muted">{language === 'en' ? 'Message' : 'Message'}</label>
                   <div className="message-content p-3 border rounded" style={{ minHeight: '150px' }}>
                     {selectedMessage.message}
                   </div>
@@ -220,7 +220,7 @@ function ContactMessagesManager() {
                       onClick={() => handleMarkAsRead(selectedMessage.id)}
                     >
                       <i className="fas fa-check me-1"></i>
-                      Mark as Read
+                      {language === 'en' ? 'Mark as Read' : 'Marquer comme lu'}
                     </button>
                   )}
                   <a
@@ -228,14 +228,14 @@ function ContactMessagesManager() {
                     className="btn btn-sm btn-outline-info"
                   >
                     <i className="fas fa-reply me-1"></i>
-                    Reply
+                    {language === 'en' ? 'Reply' : 'Répondre'}
                   </a>
                   <button
                     className="btn btn-sm btn-outline-danger"
                     onClick={() => handleDelete(selectedMessage.id)}
                   >
                     <i className="fas fa-trash me-1"></i>
-                    Delete
+                    {language === 'en' ? 'Delete' : 'Supprimer'}
                   </button>
                 </div>
               </div>
@@ -244,7 +244,7 @@ function ContactMessagesManager() {
             <div className="card">
               <div className="card-body text-center text-muted py-5">
                 <i className="fas fa-envelope-open-text fa-3x mb-3"></i>
-                <p>Select a message to view details</p>
+                <p>{language === 'en' ? 'Select a message to view details' : 'Sélectionnez un message pour voir les détails'}</p>
               </div>
             </div>
           )}

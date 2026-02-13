@@ -32,7 +32,7 @@ function HobbiesManager() {
     isOpen: false,
     id: 0
   });
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
   };
@@ -47,7 +47,7 @@ function HobbiesManager() {
       const response = await api.get('/hobbies');
       setHobbies(response.data);
     } catch (err: any) {
-      setError('Failed to load hobbies');
+      setError(language === 'en' ? 'Failed to load hobbies' : 'Échec du chargement des loisirs');
     } finally {
       setLoading(false);
     }
@@ -61,15 +61,15 @@ function HobbiesManager() {
     try {
       if (editingId) {
         await api.put(`/hobbies/${editingId}`, formData, authConfig);
-        setSuccess('Hobby updated successfully!');
+        setSuccess(language === 'en' ? 'Hobby updated successfully!' : 'Loisir mis à jour avec succès!');
       } else {
         await api.post('/hobbies', formData, authConfig);
-        setSuccess('Hobby added successfully!');
+        setSuccess(language === 'en' ? 'Hobby added successfully!' : 'Loisir ajouté avec succès!');
       }
       resetForm();
       fetchHobbies();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Operation failed');
+      setError(err.response?.data?.message || (language === 'en' ? 'Operation failed' : 'L\'opération a échoué'));
     }
   };
 
@@ -80,11 +80,11 @@ function HobbiesManager() {
   const confirmDelete = async () => {
     try {
       await api.delete(`/hobbies/${confirmDialog.id}`, authConfig);
-      setSuccess('Hobby deleted successfully!');
+      setSuccess(language === 'en' ? 'Hobby deleted successfully!' : 'Loisir supprimé avec succès!');
       fetchHobbies();
       setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Delete failed');
+      setError(err.response?.data?.message || (language === 'en' ? 'Delete failed' : 'La suppression a échoué'));
       setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
@@ -137,17 +137,17 @@ function HobbiesManager() {
 
   return (
     <div className="hobbies-manager">
-      <h2><i className="fas fa-heart"></i> Manage Hobbies</h2>
+      <h2><i className="fas fa-heart"></i> {t('admin.tabs.hobbies')} - {t('admin.manageSections')}</h2>
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
       <ConfirmationModal
         isOpen={confirmDialog.isOpen}
-        title="Delete Hobby"
-        message="Are you sure you want to delete this hobby? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={language === 'en' ? 'Delete Hobby' : 'Supprimer le loisir'}
+        message={language === 'en' ? 'Are you sure you want to delete this hobby? This action cannot be undone.' : 'Êtes-vous sûr de vouloir supprimer ce loisir? Cette action ne peut pas être annulée.'}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         isDangerous={true}
         onConfirm={confirmDelete}
         onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
@@ -156,52 +156,52 @@ function HobbiesManager() {
       <div className="row">
         <div className="col-md-6">
           <form onSubmit={handleSubmit} className="hobbies-form">
-            <h4>{editingId ? 'Edit Hobby' : 'Add New Hobby'}</h4>
+            <h4>{editingId ? (language === 'en' ? 'Edit Hobby' : 'Modifier le loisir') : (language === 'en' ? 'Add Hobby' : 'Ajouter un loisir')}</h4>
 
             <div className="mb-3">
-              <label className="form-label">Hobby Name</label>
+              <label className="form-label">{language === 'en' ? 'Hobby Name' : 'Nom du loisir'} (English)</label>
               <input
                 type="text"
                 className="form-control"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g., Photography, Reading, Gaming"
+                placeholder={language === 'en' ? 'e.g., Photography, Reading, Gaming' : 'ex. Photographie, Lecture, Jeux vidéo'}
                 required
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Hobby Name (French)</label>
+              <label className="form-label">{language === 'en' ? 'Hobby Name' : 'Nom du loisir'} (Français)</label>
               <input
                 type="text"
                 className="form-control"
                 value={formData.nameFr}
                 onChange={(e) => setFormData({ ...formData, nameFr: e.target.value })}
-                placeholder="e.g., Photographie, Lecture, Jeux vidéo"
+                placeholder={language === 'en' ? 'e.g., Photographie, Lecture, Jeux vidéo' : 'ex. Photographie, Lecture, Jeux vidéo'}
               />
-              <small className="text-muted">Optional: French translation of the hobby name</small>
+              <small className="text-muted">{language === 'en' ? 'Optional: French translation of the hobby name' : 'Optionnel : traduction française du nom du loisir'}</small>
             </div>
 
             <div className="mb-3">
-              <label className="form-label"> Add a Fun Icon</label>
+              <label className="form-label">{language === 'en' ? 'Add a Fun Icon' : 'Ajouter une icône'}</label>
               <div className="icon-selector">
                 <input
                   type="text"
                   className="form-control mb-2"
                   value={formData.icon}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  placeholder="fa-code (without fa- prefix or with it)"
+                  placeholder={language === 'en' ? 'select an icon' : 'sélectionner une icône'}
                 />
                 <div className="icon-preview">
                   {formData.icon && (
                     <>
-                      <span>Preview: </span>
+                      <span>{language === 'en' ? 'Preview:' : 'Aperçu :'} </span>
                       <i className={`fas ${formData.icon.startsWith('fa-') ? formData.icon : 'fa-' + formData.icon}`}></i>
                     </>
                   )}
                 </div>
               </div>
-              <small className="text-muted">Suggested icons:</small>
+              <small className="text-muted">{language === 'en' ? 'Suggested icons:' : 'Icônes suggérées :'}</small>
               <div className="icon-suggestions">
                 {commonIcons.map((icon) => (
                   <button
@@ -218,30 +218,30 @@ function HobbiesManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Description</label>
+              <label className="form-label">{language === 'en' ? 'Description' : 'Description'} (English)</label>
               <textarea
                 className="form-control"
                 rows={3}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Tell us more about this hobby..."
+                placeholder={language === 'en' ? 'Tell us more about this hobby...' : 'Parlez-nous de ce loisir...'}
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Description (French)</label>
+              <label className="form-label">{language === 'en' ? 'Description' : 'Description'} (Français)</label>
               <textarea
                 className="form-control"
                 rows={3}
                 value={formData.descriptionFr}
                 onChange={(e) => setFormData({ ...formData, descriptionFr: e.target.value })}
-                placeholder="Parlez-nous de ce loisir..."
+                placeholder={language === 'en' ? 'Tell us more about this hobby...' : 'Parlez-nous de ce loisir...'}
               />
-              <small className="text-muted">Optional: French translation of the description</small>
+              <small className="text-muted">{language === 'en' ? 'Optional: French translation of the description' : 'Optionnel : traduction française de la description'}</small>
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Display Order</label>
+              <label className="form-label">{language === 'en' ? 'Display Order' : 'Ordre d\'affichage'}</label>
               <input
                 type="number"
                 className="form-control"
@@ -252,11 +252,11 @@ function HobbiesManager() {
 
             <div className="d-flex gap-2">
               <button type="submit" className="btn btn-primary">
-                {editingId ? 'Update' : 'Add'} Hobby
+                {editingId ? t('common.edit') : (language === 'en' ? t('common.add') : 'Ajouter')}
               </button>
               {editingId && (
                 <button type="button" className="btn btn-secondary" onClick={resetForm}>
-                  Cancel
+                  {t('common.cancel')}
                 </button>
               )}
             </div>
@@ -264,7 +264,7 @@ function HobbiesManager() {
         </div>
 
         <div className="col-md-6">
-          <h4>Current Hobbies</h4>
+          <h4>{editingId ? (language === 'en' ? 'Edit Hobby' : 'Modifier le loisir') : (language === 'en' ? 'Current Hobbies' : 'Loisirs actuels')}</h4>
           <div className="hobbies-list">
             {hobbies.map((hobby) => (
               <div key={hobby.id} className="hobby-item">
@@ -277,9 +277,9 @@ function HobbiesManager() {
                     )}
                   </div>
                   <div className="hobby-details">
-                    <strong>{hobby.name}</strong>
-                    {hobby.description && (
-                      <small className="text-muted d-block">{hobby.description}</small>
+                    <strong>{language === 'fr' && hobby.nameFr ? hobby.nameFr : hobby.name}</strong>
+                    {(language === 'fr' ? hobby.descriptionFr : hobby.description) && (
+                      <small className="text-muted d-block">{language === 'fr' && hobby.descriptionFr ? hobby.descriptionFr : hobby.description}</small>
                     )}
                   </div>
                 </div>
@@ -301,7 +301,7 @@ function HobbiesManager() {
             ))}
             {hobbies.length === 0 && (
               <div className="text-center text-muted py-3">
-                <p>No hobbies yet. Add one above!</p>
+                <p>{language === 'en' ? 'No hobbies yet. Add one above!' : 'Aucun loisir encore. Ajoutez-en un ci-dessus!'}</p>
               </div>
             )}
           </div>

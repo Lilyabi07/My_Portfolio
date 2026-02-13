@@ -298,6 +298,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
+                      maxLength={100}
                       placeholder={t('contact.placeholders.name')}
                     />
                   </div>
@@ -314,6 +315,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         required
+                        maxLength={100}
                         placeholder={t('testimonials.title')}
                       />
                     </div>
@@ -328,6 +330,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                         required
+                        maxLength={100}
                         placeholder={t('testimonials.company')}
                       />
                     </div>
@@ -344,6 +347,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       rows={4}
                       required
+                      maxLength={500}
                       placeholder={t('contact.placeholders.message')}
                     />
                   </div>

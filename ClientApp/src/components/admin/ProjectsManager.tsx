@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { ConfirmationModal } from '../../components/common';
 import './ProjectsManager.css';
 
@@ -22,6 +23,7 @@ function ProjectsManager() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const { t, language } = useLanguage();
   const [formData, setFormData] = useState<Omit<Project, 'id'>>({
     titleEn: '',
     titleFr: '',
@@ -53,7 +55,7 @@ function ProjectsManager() {
       const response = await api.get('/projects');
       setProjects(response.data);
     } catch (err: any) {
-      setError('Failed to load projects');
+      setError(language === 'en' ? 'Failed to load projects' : 'Échec du chargement des projets');
     } finally {
       setLoading(false);
     }
@@ -64,7 +66,7 @@ function ProjectsManager() {
     if (file) {
       // Validate file is image
       if (!file.type.startsWith('image/')) {
-        setError('Please select a valid image file');
+        setError(language === 'en' ? 'Please select a valid image file' : 'Veuillez sélectionner un fichier image valide');
         return;
       }
       setImageFile(file);
@@ -106,15 +108,15 @@ function ProjectsManager() {
 
       if (editingId) {
         await api.put(`/projects/${editingId}`, projectData, authConfig);
-        setSuccess('Project updated successfully!');
+        setSuccess(language === 'en' ? 'Project updated successfully!' : 'Projet mis à jour avec succès!');
       } else {
         await api.post('/projects', projectData, authConfig);
-        setSuccess('Project added successfully!');
+        setSuccess(language === 'en' ? 'Project added successfully!' : 'Projet ajouté avec succès!');
       }
       resetForm();
       fetchProjects();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Operation failed');
+      setError(err.response?.data?.message || (language === 'en' ? 'Operation failed' : 'L\'opération a échoué'));
     }
   };
 
@@ -125,11 +127,11 @@ function ProjectsManager() {
   const confirmDelete = async () => {
     try {
       await api.delete(`/projects/${confirmDialog.id}`, authConfig);
-      setSuccess('Project deleted successfully!');
+      setSuccess(language === 'en' ? 'Project deleted successfully!' : 'Projet supprimé avec succès!');
       fetchProjects();
       setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Delete failed');
+      setError(err.response?.data?.message || (language === 'en' ? 'Delete failed' : 'La suppression a échoué'));
       setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
@@ -172,17 +174,17 @@ function ProjectsManager() {
 
   return (
     <div className="projects-manager">
-      <h2><i className="fas fa-folder"></i> Manage Projects</h2>
+      <h2><i className="fas fa-folder"></i> {t('admin.tabs.projects')} - {t('admin.manageSections')}</h2>
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
       <ConfirmationModal
         isOpen={confirmDialog.isOpen}
-        title="Delete Project"
-        message="Are you sure you want to delete this project? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={language === 'en' ? 'Delete Project' : 'Supprimer le projet'}
+        message={language === 'en' ? 'Are you sure you want to delete this project? This action cannot be undone.' : 'Êtes-vous sûr de vouloir supprimer ce projet? Cette action ne peut pas être annulée.'}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         isDangerous={true}
         onConfirm={confirmDelete}
         onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
@@ -191,10 +193,10 @@ function ProjectsManager() {
       <div className="row">
         <div className="col-md-6">
           <form onSubmit={handleSubmit} className="project-form">
-            <h4>{editingId ? 'Edit Project' : 'Add New Project'}</h4>
+            <h4>{editingId ? (language === 'en' ? 'Edit Project' : 'Modifier le projet') : (language === 'en' ? 'Add Project' : 'Ajouter un projet')}</h4>
 
             <div className="mb-3">
-              <label className="form-label">Title (English) <span className="text-danger">*</span></label>
+              <label className="form-label">{language === 'en' ? 'Title (English)' : 'Titre (anglais)'} <span className="text-danger">*</span></label>
               <input
                 type="text"
                 className="form-control"
@@ -205,7 +207,7 @@ function ProjectsManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Title (Français) <span className="text-danger">*</span></label>
+              <label className="form-label">{language === 'en' ? 'Title (French)' : 'Titre (français)'} <span className="text-danger">*</span></label>
               <input
                 type="text"
                 className="form-control"
@@ -216,7 +218,7 @@ function ProjectsManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Description (English) <span className="text-danger">*</span></label>
+              <label className="form-label">{language === 'en' ? 'Description (English)' : 'Description (anglais)'} <span className="text-danger">*</span></label>
               <textarea
                 className="form-control"
                 value={formData.descriptionEn}
@@ -227,7 +229,7 @@ function ProjectsManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Description (Français) <span className="text-danger">*</span></label>
+              <label className="form-label">{language === 'en' ? 'Description (French)' : 'Description (français)'} <span className="text-danger">*</span></label>
               <textarea
                 className="form-control"
                 value={formData.descriptionFr}
@@ -238,18 +240,18 @@ function ProjectsManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Technologies</label>
+              <label className="form-label">{t('projects.technologies')}</label>
               <input
                 type="text"
                 className="form-control"
                 value={formData.technologies}
                 onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
-                placeholder="e.g., React, ASP.NET, TypeScript"
+                placeholder={language === 'en' ? 'e.g., React, ASP.NET, TypeScript' : 'ex. React, ASP.NET, TypeScript'}
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Project URL</label>
+              <label className="form-label">{language === 'en' ? 'Project URL' : 'URL du projet'}</label>
               <input
                 type="url"
                 className="form-control"
@@ -259,7 +261,7 @@ function ProjectsManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">GitHub URL</label>
+              <label className="form-label">{language === 'en' ? 'GitHub URL' : 'URL GitHub'}</label>
               <input
                 type="url"
                 className="form-control"
@@ -269,7 +271,7 @@ function ProjectsManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Project Image (JPEG, PNG, etc.)</label>
+              <label className="form-label">{language === 'en' ? 'Project Image (JPEG, PNG, etc.)' : 'Image du projet (JPEG, PNG, etc.)'}</label>
               <input
                 type="file"
                 className="form-control"
@@ -284,7 +286,7 @@ function ProjectsManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Display Order</label>
+              <label className="form-label">{language === 'en' ? 'Display Order' : 'Ordre d\'affichage'}</label>
               <input
                 type="number"
                 className="form-control"
@@ -295,11 +297,11 @@ function ProjectsManager() {
 
             <div className="d-flex gap-2">
               <button type="submit" className="btn btn-primary">
-                {editingId ? 'Update' : 'Add'} Project
+                {editingId ? t('common.edit') : (language === 'en' ? 'Add' : 'Ajouter')}
               </button>
               {editingId && (
                 <button type="button" className="btn btn-secondary" onClick={resetForm}>
-                  Cancel
+                  {t('common.cancel')}
                 </button>
               )}
             </div>
@@ -307,28 +309,28 @@ function ProjectsManager() {
         </div>
 
         <div className="col-md-6">
-          <h4>Current Projects</h4>
+          <h4>{language === 'en' ? 'Current Projects' : 'Projets actuels'}</h4>
           <div className="projects-list">
             {projects.map(project => (
               <div key={project.id} className="project-card">
                 {project.imageUrl && (
-                  <img src={project.imageUrl} alt={project.titleEn} className="project-image" />
+                  <img src={project.imageUrl} alt={language === 'fr' ? project.titleFr : project.titleEn} className="project-image" />
                 )}
                 <div className="project-info">
-                  <h5>{project.titleEn} / {project.titleFr}</h5>
+                  <h5>{language === 'fr' ? project.titleFr : project.titleEn}</h5>
                   <p className="text-muted small">{project.technologies}</p>
                   <div className="project-actions">
                     <button
                       className="btn btn-sm btn-warning"
                       onClick={() => handleEdit(project)}
                     >
-                      <i className="fas fa-edit"></i> Edit
+                      <i className="fas fa-edit"></i> {t('common.edit')}
                     </button>
                     <button
                       className="btn btn-sm btn-danger"
                       onClick={() => handleDelete(project.id)}
                     >
-                      <i className="fas fa-trash"></i> Delete
+                      <i className="fas fa-trash"></i> {t('common.delete')}
                     </button>
                   </div>
                 </div>

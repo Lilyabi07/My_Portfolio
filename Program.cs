@@ -7,6 +7,7 @@ using MyPortfolio.Data;
 using MyPortfolio.Hubs;
 using MyPortfolio.Services;
 using System.Text;
+using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -123,6 +124,15 @@ if (!app.Environment.IsDevelopment())
 
 // Serve static files from wwwroot (including uploads)
 app.UseStaticFiles();
+
+// Serve uploads from a writable folder (Azure run-from-package is read-only)
+var uploadsRoot = Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? app.Environment.ContentRootPath, "uploads");
+Directory.CreateDirectory(uploadsRoot);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsRoot),
+    RequestPath = "/uploads"
+});
 
 // Serve SPA static files (CSS, JS, etc. from ClientApp/build)
 app.UseSpaStaticFiles();

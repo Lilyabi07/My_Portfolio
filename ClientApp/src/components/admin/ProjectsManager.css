@@ -38,6 +38,10 @@
   margin: 0 0 0.5rem 0;
 }
 
+.project-info .text-muted {
+  color: #f5f5dc !important;
+}
+
 .project-actions {
   display: flex;
   gap: 0.5rem;

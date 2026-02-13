@@ -61,12 +61,12 @@
 
 .message-preview small {
   font-size: 12px;
-  color: rgba(184, 212, 241, 0.8);
+  color: #f5f5dc;
 }
 
 .message-preview p {
   font-size: 13px;
-  color: rgba(245, 245, 245, 0.9);
+  color: #ffffff;
   line-height: 1.4;
 }
 
@@ -76,14 +76,14 @@
 }
 
 .theme-dark .message-preview p {
-  color: rgba(245, 245, 245, 0.95);
+  color: #ffffff;
 }
 
 .message-content {
   white-space: pre-wrap;
   word-break: break-word;
   line-height: 1.6;
-  color: rgba(245, 245, 245, 0.95);
+  color: #ffffff;
   font-size: 14px;
   background: rgba(15, 39, 68, 0.4);
   padding: 1rem;
@@ -93,7 +93,7 @@
 
 /* Dark theme override */
 .theme-dark .message-content {
-  color: rgba(245, 245, 245, 0.95);
+  color: #ffffff;
   background: rgba(15, 39, 68, 0.6);
   border-left-color: #66bbff;
 }

@@ -43,8 +43,10 @@ namespace MyPortfolio.Controllers
             if (existing == null) return false;
 
             existing.Name = updated.Name ?? existing.Name;
+            existing.NameFr = updated.NameFr ?? existing.NameFr;
             existing.Icon = updated.Icon ?? existing.Icon;
             existing.Description = updated.Description ?? existing.Description;
+            existing.DescriptionFr = updated.DescriptionFr ?? existing.DescriptionFr;
             existing.DisplayOrder = updated.DisplayOrder;
 
             _db.Hobbies.Update(existing);

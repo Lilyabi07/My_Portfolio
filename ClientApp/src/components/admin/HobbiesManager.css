@@ -32,6 +32,11 @@
   font-weight: 500;
 }
 
+.hobbies-manager .text-muted,
+.hobbies-manager small.text-muted {
+  color: #f5f5dc !important;
+}
+
 .hobbies-form {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -144,7 +149,7 @@
 }
 
 .hobby-details small {
-  color: rgba(184, 212, 241, 0.8);
+  color: #f5f5dc;
   line-height: 1.4;
 }
 

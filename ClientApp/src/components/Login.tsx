@@ -106,10 +106,6 @@ function Login({ onLoginSuccess }: LoginProps) {
             {loading ? t('admin.loggingIn') : t('nav.login')}
           </button>
         </form>
-
-        <div className="login-footer">
-          <p className="text-muted">{t('admin.defaultCredentials')}</p>
-        </div>
       </div>
     </div>
   );

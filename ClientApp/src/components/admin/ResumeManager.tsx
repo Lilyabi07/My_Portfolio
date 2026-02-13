@@ -24,7 +24,7 @@ function ResumeManager() {
     isOpen: false,
     id: 0
   });
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
@@ -40,7 +40,7 @@ function ResumeManager() {
       const response = await api.get('/resume');
       setResumes(response.data);
     } catch (err: any) {
-      setError('Failed to load resumes');
+      setError(language === 'en' ? 'Failed to load resumes' : 'Échec du chargement des CV');
     } finally {
       setLoading(false);
     }
@@ -51,13 +51,13 @@ function ResumeManager() {
     if (file) {
       // Validate file type
       if (file.type !== 'application/pdf') {
-        setError('Only PDF files are allowed');
+        setError(language === 'en' ? 'Only PDF files are allowed' : 'Seuls les fichiers PDF sont autorisés');
         setSelectedFile(null);
         return;
       }
       // Validate file size (5MB max)
       if (file.size > 5 * 1024 * 1024) {
-        setError('File size must be less than 5MB');
+        setError(language === 'en' ? 'File size must be less than 5MB' : 'La taille du fichier doit être inférieure à 5 Mo');
         setSelectedFile(null);
         return;
       }
@@ -69,7 +69,7 @@ function ResumeManager() {
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) {
-      setError('Please select a PDF file');
+      setError(language === 'en' ? 'Please select a PDF file' : 'Veuillez sélectionner un fichier PDF');
       return;
     }
 
@@ -88,14 +88,14 @@ function ResumeManager() {
         }
       });
 
-      setSuccess('CV uploaded successfully!');
+      setSuccess(language === 'en' ? 'CV uploaded successfully!' : 'CV téléchargé avec succès!');
       setSelectedFile(null);
       // Reset file input
       const fileInput = document.getElementById('file-input') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
       fetchResumes();
     } catch (err: any) {
-      setError(err.response?.data || 'Upload failed');
+      setError(err.response?.data || (language === 'en' ? 'Upload failed' : 'Le téléversement a échoué'));
     } finally {
       setUploading(false);
     }
@@ -104,12 +104,12 @@ function ResumeManager() {
   const handleUpdateNotes = async (id: number) => {
     try {
       await api.put(`/resume/${id}`, { notes }, authConfig);
-      setSuccess('Notes updated successfully!');
+      setSuccess(language === 'en' ? 'Notes updated successfully!' : 'Notes mises à jour avec succès!');
       setEditingId(null);
       setNotes('');
       fetchResumes();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Update failed');
+      setError(err.response?.data?.message || (language === 'en' ? 'Update failed' : 'La mise à jour a échoué'));
     }
   };
 
@@ -120,11 +120,11 @@ function ResumeManager() {
   const confirmDelete = async () => {
     try {
       await api.delete(`/resume/${confirmDialog.id}`, authConfig);
-      setSuccess('CV deleted successfully!');
+      setSuccess(language === 'en' ? 'CV deleted successfully!' : 'CV supprimé avec succès!');
       fetchResumes();
       setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Delete failed');
+      setError(err.response?.data?.message || (language === 'en' ? 'Delete failed' : 'La suppression a échoué'));
       setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
@@ -162,7 +162,7 @@ function ResumeManager() {
 
   return (
     <div className="resume-manager">
-      <h2><i className="fas fa-file-pdf"></i> Manage Resume / CV</h2>
+      <h2><i className="fas fa-file-pdf"></i> {t('admin.tabs.resume')} - {t('admin.manageSections')}</h2>
 
       {error && <div className="alert alert-danger alert-dismissible fade show" role="alert">
         {error}
@@ -176,10 +176,10 @@ function ResumeManager() {
 
       <ConfirmationModal
         isOpen={confirmDialog.isOpen}
-        title="Delete Resume"
-        message="Are you sure you want to delete this CV? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={language === 'en' ? 'Delete Resume' : 'Supprimer le CV'}
+        message={language === 'en' ? 'Are you sure you want to delete this CV? This action cannot be undone.' : 'Êtes-vous sûr de vouloir supprimer ce CV? Cette action ne peut pas être annulée.'}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         isDangerous={true}
         onConfirm={confirmDelete}
         onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
@@ -190,13 +190,13 @@ function ResumeManager() {
         <div className="col-md-5">
           <div className="card mb-4">
             <div className="card-header">
-              <h5 className="mb-0"><i className="fas fa-cloud-upload-alt"></i> Upload New CV</h5>
+              <h5 className="mb-0"><i className="fas fa-cloud-upload-alt"></i> {language === 'en' ? 'Upload New CV' : 'Télécharger un nouveau CV'}</h5>
             </div>
             <div className="card-body">
               <form onSubmit={handleUpload}>
                 <div className="mb-3">
                   <label htmlFor="file-input" className="form-label">
-                    Select PDF File (Max 5MB)
+                    {language === 'en' ? 'Select PDF File (Max 5MB)' : 'Sélectionnez un fichier PDF (Max 5 Mo)'}
                   </label>
                   <input
                     id="file-input"
@@ -224,12 +224,12 @@ function ResumeManager() {
                   {uploading ? (
                     <>
                       <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      Uploading...
+                      {language === 'en' ? 'Uploading...' : 'Téléversement...'}
                     </>
                   ) : (
                     <>
                       <i className="fas fa-upload me-2"></i>
-                      Upload CV
+                      {language === 'en' ? 'Upload CV' : 'Téléverser le CV'}
                     </>
                   )}
                 </button>
@@ -237,8 +237,7 @@ function ResumeManager() {
 
               <div className="alert alert-info mt-3 mb-0">
                 <small>
-                  <i className="fas fa-info-circle"></i> Only PDF files are accepted. 
-                  The uploaded CV will be available for download on the Resume page.
+                  <i className="fas fa-info-circle"></i> {language === 'en' ? 'Only PDF files are accepted. The uploaded CV will be available for download on the Resume page.' : 'Seuls les fichiers PDF sont acceptés. Le CV téléchargé sera disponible en téléchargement sur la page CV.'}
                 </small>
               </div>
             </div>
@@ -249,13 +248,13 @@ function ResumeManager() {
         <div className="col-md-7">
           <div className="card">
             <div className="card-header">
-              <h5 className="mb-0"><i className="fas fa-list"></i> Uploaded CVs</h5>
+              <h5 className="mb-0"><i className="fas fa-list"></i> {language === 'en' ? 'Uploaded CVs' : 'CV téléchargés'}</h5>
             </div>
             <div className="card-body">
               {resumes.length === 0 ? (
                 <div className="text-center text-muted py-4">
                   <i className="fas fa-folder-open fa-3x mb-3"></i>
-                  <p>No CVs uploaded yet. Upload your first CV above.</p>
+                  <p>{language === 'en' ? 'No CVs uploaded yet. Upload your first CV above.' : 'Aucun CV téléchargé pour l\'instant. Téléversez votre premier CV ci-dessus.'}</p>
                 </div>
               ) : (
                 <div className="resumes-list">
@@ -270,13 +269,13 @@ function ResumeManager() {
                             </h6>
                             <small className="text-muted">
                               <i className="fas fa-clock me-1"></i>
-                              Updated: {formatDate(resume.updatedAt)}
+                              {language === 'en' ? 'Updated:' : 'Mis à jour :'} {formatDate(resume.updatedAt)}
                             </small>
                           </div>
                           <div className="resume-actions">
                             <button
                               className="btn btn-sm btn-info me-1"
-                              title="View CV"
+                              title={language === 'en' ? 'View CV' : 'Voir le CV'}
                               onClick={(e) => {
                                 e.preventDefault();
                                 // Open in new tab - browser will handle PDF display
@@ -287,7 +286,7 @@ function ResumeManager() {
                             </button>
                               <button
                               className="btn btn-sm btn-success me-1"
-                              title="Download CV"
+                              title={language === 'en' ? 'Download CV' : 'Télécharger le CV'}
                               onClick={(e) => {
                                 e.preventDefault();
                                 // Create download link
@@ -304,14 +303,14 @@ function ResumeManager() {
                             <button
                               className="btn btn-sm btn-warning me-1"
                               onClick={() => handleEdit(resume)}
-                              title="Edit Notes"
+                              title={language === 'en' ? 'Edit Notes' : 'Modifier les notes'}
                             >
                               <i className="fas fa-edit"></i>
                             </button>
                             <button
                               className="btn btn-sm btn-danger"
                               onClick={() => handleDelete(resume.id)}
-                              title="Delete CV"
+                              title={language === 'en' ? 'Delete CV' : 'Supprimer le CV'}
                             >
                               <i className="fas fa-trash"></i>
                             </button>
@@ -325,7 +324,7 @@ function ResumeManager() {
                               rows={2}
                               value={notes}
                               onChange={(e) => setNotes(e.target.value)}
-                              placeholder="Add notes about this CV version..."
+                              placeholder={language === 'en' ? 'Add notes about this CV version...' : 'Ajoutez des notes sur cette version du CV...'}
                             />
                             <div className="d-flex gap-2">
                               <button
@@ -367,8 +366,7 @@ function ResumeManager() {
 
       <div className="alert alert-warning mt-4">
         <i className="fas fa-exclamation-triangle me-2"></i>
-        <strong>Note:</strong> The most recently uploaded CV will be displayed on the public Resume page. 
-        Users will see a "Download CV" option linking to your latest uploaded file.
+        <strong>{language === 'en' ? 'Note:' : 'Remarque:'}</strong> {language === 'en' ? 'The most recently uploaded CV will be displayed on the public Resume page. Users will see a "Download CV" option linking to your latest uploaded file.' : 'Le CV le plus récemment téléchargé s\'affichera sur la page CV publique. Les utilisateurs verront une option "Télécharger mon CV" pointant vers votre dernier fichier téléchargé.'}
       </div>
     </div>
   );

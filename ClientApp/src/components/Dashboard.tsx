@@ -19,7 +19,7 @@ type AdminTab = 'skills' | 'projects' | 'experience' | 'education' | 'resume' | 
 
 function Dashboard({ adminUsername, onLogout }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<AdminTab>('skills');
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -34,8 +34,15 @@ function Dashboard({ adminUsername, onLogout }: DashboardProps) {
           <span className="navbar-brand">
             <i className="fas fa-cube"></i> {t('admin.title')}
           </span>
-          <div className="navbar-text text-white">
-            <span className="me-3">{t('admin.welcome')} {adminUsername}!</span>
+          <div className="navbar-text text-white d-flex align-items-center gap-2">
+            <span className="me-2">{t('admin.welcome')} {adminUsername}!</span>
+            <button 
+              className="btn btn-sm btn-outline-light"
+              onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')}
+              title={t('common.language')}
+            >
+              <i className="fas fa-globe"></i> {language === 'en' ? 'FR' : 'EN'}
+            </button>
             <button className="btn btn-sm btn-danger" onClick={handleLogout}>
               <i className="fas fa-sign-out-alt"></i> {t('nav.logout')}
             </button>

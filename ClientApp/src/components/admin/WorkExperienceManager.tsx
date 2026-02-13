@@ -34,7 +34,7 @@ function WorkExperienceManager() {
     isOpen: false,
     id: 0
   });
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
   };
@@ -49,7 +49,7 @@ function WorkExperienceManager() {
       const response = await api.get('/work-experience');
       setExperiences(response.data);
     } catch (err: any) {
-      setError('Failed to load experiences');
+      setError(language === 'en' ? 'Failed to load experiences' : 'Échec du chargement des expériences');
     } finally {
       setLoading(false);
     }
@@ -63,15 +63,15 @@ function WorkExperienceManager() {
     try {
       if (editingId) {
         await api.put(`/work-experience/${editingId}`, formData, authConfig);
-        setSuccess('Experience updated successfully!');
+        setSuccess(language === 'en' ? 'Experience updated successfully!' : 'Expérience mise à jour avec succès!');
       } else {
         await api.post('/work-experience', formData, authConfig);
-        setSuccess('Experience added successfully!');
+        setSuccess(language === 'en' ? 'Experience added successfully!' : 'Expérience ajoutée avec succès!');
       }
       resetForm();
       fetchExperiences();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Operation failed');
+      setError(err.response?.data?.message || (language === 'en' ? 'Operation failed' : 'L\'opération a échoué'));
     }
   };
 
@@ -82,11 +82,11 @@ function WorkExperienceManager() {
   const confirmDelete = async () => {
     try {
       await api.delete(`/work-experience/${confirmDialog.id}`, authConfig);
-      setSuccess('Experience deleted successfully!');
+      setSuccess(language === 'en' ? 'Experience deleted successfully!' : 'Expérience supprimée avec succès!');
       fetchExperiences();
       setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Delete failed');
+      setError(err.response?.data?.message || (language === 'en' ? 'Delete failed' : 'La suppression a échoué'));
       setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
@@ -121,17 +121,17 @@ function WorkExperienceManager() {
 
   return (
     <div className="experience-manager">
-      <h2><i className="fas fa-briefcase"></i> Manage Work Experience</h2>
+      <h2><i className="fas fa-briefcase"></i> {t('admin.tabs.experience')} - {t('admin.manageSections')}</h2>
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
       <ConfirmationModal
         isOpen={confirmDialog.isOpen}
-        title="Delete Experience"
-        message="Are you sure you want to delete this work experience entry? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={language === 'en' ? 'Delete Experience' : 'Supprimer l\'expérience'}
+        message={language === 'en' ? 'Are you sure you want to delete this work experience entry? This action cannot be undone.' : 'Êtes-vous sûr de vouloir supprimer cette entrée d\'expérience de travail? Cette action ne peut pas être annulée.'}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         isDangerous={true}
         onConfirm={confirmDelete}
         onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
@@ -140,10 +140,10 @@ function WorkExperienceManager() {
       <div className="row">
         <div className="col-md-6">
           <form onSubmit={handleSubmit} className="experience-form">
-            <h4>{editingId ? 'Edit Experience' : 'Add New Experience'}</h4>
+            <h4>{editingId ? (language === 'en' ? 'Edit Experience' : 'Modifier l\'expérience') : (language === 'en' ? 'Add Experience' : 'Ajouter une expérience')}</h4>
 
             <div className="mb-3">
-              <label className="form-label">Company (EN)</label>
+              <label className="form-label">{language === 'en' ? 'Company (EN)' : 'Entreprise (EN)'}</label>
               <input
                 type="text"
                 className="form-control"
@@ -154,7 +154,7 @@ function WorkExperienceManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Position</label>
+              <label className="form-label">{language === 'en' ? 'Position' : 'Poste'}</label>
               <input
                 type="text"
                 className="form-control"
@@ -165,7 +165,7 @@ function WorkExperienceManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Description</label>
+              <label className="form-label">{t('projects.description')}</label>
               <textarea
                 className="form-control"
                 value={formData.description}
@@ -177,7 +177,7 @@ function WorkExperienceManager() {
             <div className="row">
               <div className="col-md-6">
                 <div className="mb-3">
-                  <label className="form-label">Start Date</label>
+                  <label className="form-label">{language === 'en' ? 'Start Date' : 'Date de début'}</label>
                   <input
                     type="date"
                     className="form-control"
@@ -189,7 +189,7 @@ function WorkExperienceManager() {
               </div>
               <div className="col-md-6">
                 <div className="mb-3">
-                  <label className="form-label">End Date</label>
+                  <label className="form-label">{language === 'en' ? 'End Date' : 'Date de fin'}</label>
                   <input
                     type="date"
                     className="form-control"
@@ -214,12 +214,12 @@ function WorkExperienceManager() {
                 })}
               />
               <label className="form-check-label" htmlFor="isCurrent">
-                Currently working here
+                {language === 'en' ? 'Currently working here' : 'Actuellement en poste'}
               </label>
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Display Order</label>
+              <label className="form-label">{language === 'en' ? 'Display Order' : 'Ordre d\'affichage'}</label>
               <input
                 type="number"
                 className="form-control"
@@ -230,11 +230,11 @@ function WorkExperienceManager() {
 
             <div className="d-flex gap-2">
               <button type="submit" className="btn btn-primary">
-                {editingId ? 'Update' : 'Add'} Experience
+                {editingId ? t('common.edit') : (language === 'en' ? 'Add' : 'Ajouter')}
               </button>
               {editingId && (
                 <button type="button" className="btn btn-secondary" onClick={resetForm}>
-                  Cancel
+                  {t('common.cancel')}
                 </button>
               )}
             </div>
@@ -242,30 +242,30 @@ function WorkExperienceManager() {
         </div>
 
         <div className="col-md-6">
-          <h4>Timeline</h4>
+          <h4>{language === 'en' ? 'Timeline' : 'Chronologie'}</h4>
           <div className="timeline">
             {experiences.map(exp => (
               <div key={exp.id} className="timeline-item">
                 <div className="timeline-marker"></div>
                 <div className="timeline-content">
-                  <h5>{exp.positionEn}</h5>
-                  <p className="company">{exp.companyEn}</p>
+                  <h5>{exp.position}</h5>
+                  <p className="company">{exp.company}</p>
                   <p className="dates">
                     {new Date(exp.startDate).toLocaleDateString()} - {' '}
-                    {exp.isCurrent ? <span className="badge bg-success">Current</span> : new Date(exp.endDate).toLocaleDateString()}
+                    {exp.isCurrent ? <span className="badge bg-success">{language === 'en' ? 'Current' : 'Actuel'}</span> : new Date(exp.endDate).toLocaleDateString()}
                   </p>
                   <div className="actions">
                     <button
                       className="btn btn-sm btn-warning"
                       onClick={() => handleEdit(exp)}
                     >
-                      <i className="fas fa-edit"></i> Edit
+                      <i className="fas fa-edit"></i> {t('common.edit')}
                     </button>
                     <button
                       className="btn btn-sm btn-danger"
                       onClick={() => handleDelete(exp.id)}
                     >
-                      <i className="fas fa-trash"></i> Delete
+                      <i className="fas fa-trash"></i> {t('common.delete')}
                     </button>
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { ConfirmationModal } from '../../components/common';
 import './TestimonialsManager.css';
 
@@ -25,6 +26,7 @@ function TestimonialsManager() {
     id: 0,
     action: 'delete'
   });
+  const { t, language } = useLanguage();
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
   };
@@ -39,7 +41,7 @@ function TestimonialsManager() {
       const response = await api.get('/testimonials/admin/all', authConfig);
       setTestimonials(response.data);
     } catch (err: any) {
-      setError('Failed to load testimonials');
+      setError(language === 'en' ? 'Failed to load testimonials' : 'Échec du chargement des témoignages');
     } finally {
       setLoading(false);
     }
@@ -57,20 +59,20 @@ function TestimonialsManager() {
   const handlePublish = async (id: number) => {
     try {
       await api.put(`/testimonials/${id}/publish`, {}, authConfig);
-      setSuccess('Testimonial published!');
+      setSuccess(language === 'en' ? 'Testimonial published!' : 'Témoignage publié!');
       fetchTestimonials();
     } catch (err: any) {
-      setError('Failed to publish testimonial');
+      setError(language === 'en' ? 'Failed to publish testimonial' : 'Échec de la publication du témoignage');
     }
   };
 
   const handleUnpublish = async (id: number) => {
     try {
       await api.put(`/testimonials/${id}/unpublish`, {}, authConfig);
-      setSuccess('Testimonial unpublished!');
+      setSuccess(language === 'en' ? 'Testimonial unpublished!' : 'Témoignage dépublié!');
       fetchTestimonials();
     } catch (err: any) {
-      setError('Failed to unpublish testimonial');
+      setError(language === 'en' ? 'Failed to unpublish testimonial' : 'Échec de la dépublication du témoignage');
     }
   };
 
@@ -81,11 +83,11 @@ function TestimonialsManager() {
   const confirmDelete = async () => {
     try {
       await api.delete(`/testimonials/${confirmDialog.id}`, authConfig);
-      setSuccess('Testimonial deleted successfully!');
+      setSuccess(language === 'en' ? 'Testimonial deleted successfully!' : 'Témoignage supprimé avec succès!');
       fetchTestimonials();
       setConfirmDialog({ isOpen: false, id: 0, action: 'delete' });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Delete failed');
+      setError(err.response?.data?.message || (language === 'en' ? 'Delete failed' : 'La suppression a échoué'));
       setConfirmDialog({ isOpen: false, id: 0, action: 'delete' });
     }
   };
@@ -106,17 +108,17 @@ function TestimonialsManager() {
 
   return (
     <div className="testimonials-manager">
-      <h2><i className="fas fa-comments"></i> Manage Testimonials</h2>
+      <h2><i className="fas fa-comments"></i> {t('admin.tabs.testimonials')} - {t('admin.manageSections')}</h2>
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
       <ConfirmationModal
         isOpen={confirmDialog.isOpen}
-        title="Delete Testimonial"
-        message="Are you sure you want to delete this testimonial? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={language === 'en' ? 'Delete Testimonial' : 'Supprimer le témoignage'}
+        message={language === 'en' ? 'Are you sure you want to delete this testimonial? This action cannot be undone.' : 'Êtes-vous sûr de vouloir supprimer ce témoignage? Cette action ne peut pas être annulée.'}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         isDangerous={true}
         onConfirm={confirmDelete}
         onCancel={() => setConfirmDialog({ isOpen: false, id: 0, action: 'delete' })}
@@ -132,7 +134,7 @@ function TestimonialsManager() {
             type="button"
             role="tab"
           >
-            Pending Review ({pendingTestimonials.length})
+            {language === 'en' ? 'Pending Review' : 'En attente d\'examen'} ({pendingTestimonials.length})
           </button>
         </li>
         <li className="nav-item" role="presentation">
@@ -144,7 +146,7 @@ function TestimonialsManager() {
             type="button"
             role="tab"
           >
-            Published ({publishedTestimonials.length})
+            {language === 'en' ? 'Published' : 'Publié'} ({publishedTestimonials.length})
           </button>
         </li>
       </ul>
@@ -153,7 +155,7 @@ function TestimonialsManager() {
         {/* Pending Testimonials */}
         <div className="tab-pane fade show active" id="pending" role="tabpanel">
           {pendingTestimonials.length === 0 ? (
-            <div className="alert alert-info">No pending testimonials</div>
+            <div className="alert alert-info">{language === 'en' ? 'No pending testimonials' : 'Aucun témoignage en attente'}</div>
           ) : (
             <div className="testimonials-list">
               {pendingTestimonials.map(testimonial => (
@@ -164,8 +166,8 @@ function TestimonialsManager() {
                     )}
                     <div className="testimonial-info">
                       <h5>{testimonial.name}</h5>
-                      <p className="meta">{testimonial.title} at {testimonial.company}</p>
-                      <p className="date">Submitted: {new Date(testimonial.submittedDate).toLocaleDateString()}</p>
+                      <p className="meta">{testimonial.title} {language === 'en' ? 'at' : 'chez'} {testimonial.company}</p>
+                      <p className="date">{language === 'en' ? 'Submitted:' : 'Soumis :'} {new Date(testimonial.submittedDate).toLocaleDateString()}</p>
                     </div>
                   </div>
                   {testimonial.rating && (
@@ -181,13 +183,13 @@ function TestimonialsManager() {
                       className="btn btn-sm btn-success"
                       onClick={() => handlePublish(testimonial.id)}
                     >
-                      <i className="fas fa-check"></i> Approve & Publish
+                      <i className="fas fa-check"></i> {language === 'en' ? 'Approve & Publish' : 'Approuver et publier'}
                     </button>
                     <button
                       className="btn btn-sm btn-danger"
                       onClick={() => handleDelete(testimonial.id)}
                     >
-                      <i className="fas fa-trash"></i> Reject
+                      <i className="fas fa-trash"></i> {language === 'en' ? 'Reject' : 'Rejeter'}
                     </button>
                   </div>
                 </div>
@@ -199,7 +201,7 @@ function TestimonialsManager() {
         {/* Published Testimonials */}
         <div className="tab-pane fade" id="published" role="tabpanel">
           {publishedTestimonials.length === 0 ? (
-            <div className="alert alert-info">No published testimonials</div>
+            <div className="alert alert-info">{language === 'en' ? 'No published testimonials' : 'Aucun témoignage publié'}</div>
           ) : (
             <div className="testimonials-list">
               {publishedTestimonials.map(testimonial => (
@@ -210,8 +212,8 @@ function TestimonialsManager() {
                     )}
                     <div className="testimonial-info">
                       <h5>{testimonial.name}</h5>
-                      <p className="meta">{testimonial.title} at {testimonial.company}</p>
-                      <p className="date">Published: {new Date(testimonial.submittedDate).toLocaleDateString()}</p>
+                      <p className="meta">{testimonial.title} {language === 'en' ? 'at' : 'chez'} {testimonial.company}</p>
+                      <p className="date">{language === 'en' ? 'Published:' : 'Publié :'} {new Date(testimonial.submittedDate).toLocaleDateString()}</p>
                     </div>
                   </div>
                   {testimonial.rating && (
@@ -227,13 +229,13 @@ function TestimonialsManager() {
                       className="btn btn-sm btn-warning"
                       onClick={() => handleUnpublish(testimonial.id)}
                     >
-                      <i className="fas fa-eye-slash"></i> Unpublish
+                      <i className="fas fa-eye-slash"></i> {language === 'en' ? 'Unpublish' : 'Dépublier'}
                     </button>
                     <button
                       className="btn btn-sm btn-danger"
                       onClick={() => handleDelete(testimonial.id)}
                     >
-                      <i className="fas fa-trash"></i> Delete
+                      <i className="fas fa-trash"></i> {language === 'en' ? 'Delete' : 'Supprimer'}
                     </button>
                   </div>
                 </div>
