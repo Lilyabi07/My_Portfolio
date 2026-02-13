@@ -25,6 +25,22 @@ namespace MyPortfolio.Controllers
             _env = env;
         }
 
+        private string GetUploadsRoot()
+        {
+            return Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? _env.ContentRootPath, "uploads");
+        }
+
+        private string ResolveUploadsPath(string fileUrl)
+        {
+            var relative = fileUrl.TrimStart('/');
+            if (relative.StartsWith("uploads/", StringComparison.OrdinalIgnoreCase))
+            {
+                relative = relative.Substring("uploads/".Length);
+            }
+
+            return Path.Combine(GetUploadsRoot(), relative.Replace('/', Path.DirectorySeparatorChar));
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -74,8 +90,7 @@ namespace MyPortfolio.Controllers
                 return NotFound(new { message = "No file associated with this CV" });
 
             // Extract filename from URL
-            var filePath = Path.Combine(_env.WebRootPath ?? "wwwroot", 
-                resume.FileUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+            var filePath = ResolveUploadsPath(resume.FileUrl);
 
             if (!System.IO.File.Exists(filePath))
                 return NotFound(new { message = "File not found on server" });
@@ -96,8 +111,7 @@ namespace MyPortfolio.Controllers
                 return NotFound(new { message = "No CV available" });
 
             // Extract filename from URL
-            var filePath = Path.Combine(_env.WebRootPath ?? "wwwroot", 
-                latestResume.FileUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+            var filePath = ResolveUploadsPath(latestResume.FileUrl);
 
             if (!System.IO.File.Exists(filePath))
                 return NotFound(new { message = "File not found on server" });
@@ -120,7 +134,7 @@ namespace MyPortfolio.Controllers
             if (!string.Equals(ext, ".pdf", StringComparison.OrdinalIgnoreCase))
                 return BadRequest("Only PDF files are allowed.");
 
-            var uploadsFolder = Path.Combine(_env.WebRootPath ?? "wwwroot", "uploads", "resumes");
+            var uploadsFolder = Path.Combine(GetUploadsRoot(), "resumes");
             Directory.CreateDirectory(uploadsFolder);
 
             var fileName = $"{Guid.NewGuid()}{ext}";
@@ -177,7 +191,7 @@ namespace MyPortfolio.Controllers
             if (!string.IsNullOrWhiteSpace(existing.FileUrl))
             {
                 var relative = existing.FileUrl.Replace('/', Path.DirectorySeparatorChar).TrimStart(Path.DirectorySeparatorChar);
-                var physical = Path.Combine(_env.WebRootPath ?? "wwwroot", relative);
+                var physical = ResolveUploadsPath(existing.FileUrl);
                 if (System.IO.File.Exists(physical))
                 {
                     try

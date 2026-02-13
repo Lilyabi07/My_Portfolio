@@ -13,13 +13,11 @@ namespace MyPortfolio.Controllers
         public UploadController(ILogger<UploadController> logger, IWebHostEnvironment env)
         {
             _logger = logger;
-            _uploadDir = Path.Combine(env.WebRootPath, "uploads", "projects");
+            var uploadsRoot = Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? env.ContentRootPath, "uploads");
+            _uploadDir = Path.Combine(uploadsRoot, "projects");
             
             // Ensure directory exists
-            if (!Directory.Exists(_uploadDir))
-            {
-                Directory.CreateDirectory(_uploadDir);
-            }
+            Directory.CreateDirectory(_uploadDir);
         }
 
         [HttpPost("project-image")]

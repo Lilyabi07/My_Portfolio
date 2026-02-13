@@ -92,14 +92,14 @@
 .testimonial-info .meta {
   margin: 0.25rem 0 0 0;
   font-size: 0.85rem;
-  color: rgba(184, 212, 241, 0.9);
+  color: #f5f5dc;
   font-weight: 500;
 }
 
 .testimonial-info .date {
   margin: 0.25rem 0 0 0;
   font-size: 0.75rem;
-  color: rgba(184, 212, 241, 0.8);
+  color: #f5f5dc;
 }
 
 .stars {
@@ -118,7 +118,7 @@
 }
 
 .message {
-  color: rgba(245, 245, 245, 0.95);
+  color: #ffffff;
   font-style: italic;
   font-size: 0.95rem;
   margin: 1rem 0;

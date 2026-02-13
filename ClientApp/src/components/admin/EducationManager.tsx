@@ -40,7 +40,7 @@ function EducationManager() {
     isOpen: false,
     id: 0
   });
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const authConfig = {
     headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
   };
@@ -55,7 +55,7 @@ function EducationManager() {
       const response = await api.get('/education');
       setEducations(response.data);
     } catch (err: any) {
-      setError('Failed to load education');
+      setError(language === 'en' ? 'Failed to load education' : 'Échec du chargement de l\'éducation');
     } finally {
       setLoading(false);
     }
@@ -69,15 +69,15 @@ function EducationManager() {
     try {
       if (editingId) {
         await api.put(`/education/${editingId}`, formData, authConfig);
-        setSuccess('Education updated successfully!');
+        setSuccess(language === 'en' ? 'Education updated successfully!' : 'Éducation mise à jour avec succès!');
       } else {
         await api.post('/education', formData, authConfig);
-        setSuccess('Education added successfully!');
+        setSuccess(language === 'en' ? 'Education added successfully!' : 'Éducation ajoutée avec succès!');
       }
       resetForm();
       fetchEducations();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Operation failed');
+      setError(err.response?.data?.message || (language === 'en' ? 'Operation failed' : 'L\'opération a échoué'));
     }
   };
 
@@ -88,11 +88,11 @@ function EducationManager() {
   const confirmDelete = async () => {
     try {
       await api.delete(`/education/${confirmDialog.id}`, authConfig);
-      setSuccess('Education deleted successfully!');
+      setSuccess(language === 'en' ? 'Education deleted successfully!' : 'Éducation supprimée avec succès!');
       fetchEducations();
       setConfirmDialog({ isOpen: false, id: 0 });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Delete failed');
+      setError(err.response?.data?.message || (language === 'en' ? 'Delete failed' : 'La suppression a échoué'));
       setConfirmDialog({ isOpen: false, id: 0 });
     }
   };
@@ -133,17 +133,17 @@ function EducationManager() {
 
   return (
     <div className="education-manager">
-      <h2><i className="fas fa-graduation-cap"></i> Manage Education</h2>
+      <h2><i className="fas fa-graduation-cap"></i> {t('admin.tabs.education')} - {t('admin.manageSections')}</h2>
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
       <ConfirmationModal
         isOpen={confirmDialog.isOpen}
-        title="Delete Education"
-        message="Are you sure you want to delete this education entry? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={language === 'en' ? 'Delete Education' : 'Supprimer l\'éducation'}
+        message={language === 'en' ? 'Are you sure you want to delete this education entry? This action cannot be undone.' : 'Êtes-vous sûr de vouloir supprimer cette entrée éducation? Cette action ne peut pas être annulée.'}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
         isDangerous={true}
         onConfirm={confirmDelete}
         onCancel={() => setConfirmDialog({ isOpen: false, id: 0 })}
@@ -152,10 +152,10 @@ function EducationManager() {
       <div className="row">
         <div className="col-md-6">
           <form onSubmit={handleSubmit} className="education-form">
-            <h4>{editingId ? 'Edit Education' : 'Add New Education'}</h4>
+            <h4>{editingId ? (language === 'en' ? 'Edit Education' : 'Modifier l\'éducation') : (language === 'en' ? 'Add Education' : 'Ajouter une formation')}</h4>
 
             <div className="mb-3">
-              <label className="form-label">Degree/Certification</label>
+              <label className="form-label">{language === 'en' ? 'Degree/Certification' : 'Diplôme/Certification'}</label>
               <input
                 type="text"
                 className="form-control"
@@ -167,7 +167,7 @@ function EducationManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Degree/Certification (French)</label>
+              <label className="form-label">{language === 'en' ? 'Degree/Certification (French)' : 'Diplôme/Certification (français)'}</label>
               <input
                 type="text"
                 className="form-control"
@@ -175,11 +175,11 @@ function EducationManager() {
                 onChange={(e) => setFormData({ ...formData, degreeFr: e.target.value })}
                 placeholder="e.g., Baccalauréat en sciences"
               />
-              <small className="text-muted">Optional: French translation of the degree</small>
+              <small className="text-muted">{language === 'en' ? 'Optional: French translation of the degree' : 'Optionnel : traduction française du diplôme'}</small>
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Institution</label>
+              <label className="form-label">{language === 'en' ? 'Institution' : 'Institution'}</label>
               <input
                 type="text"
                 className="form-control"
@@ -191,7 +191,7 @@ function EducationManager() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Institution (French)</label>
+              <label className="form-label">{language === 'en' ? 'Institution (French)' : 'Institution (français)'}</label>
               <input
                 type="text"
                 className="form-control"
@@ -199,11 +199,11 @@ function EducationManager() {
                 onChange={(e) => setFormData({ ...formData, institutionFr: e.target.value })}
                 placeholder="e.g., Nom de l'université"
               />
-              <small className="text-muted">Optional: French translation of the institution name</small>
+              <small className="text-muted">{language === 'en' ? 'Optional: French translation of the institution name' : 'Optionnel : traduction française du nom de l\'institution'}</small>
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Start Date</label>
+              <label className="form-label">{language === 'en' ? 'Start Date' : 'Date de début'}</label>
               <input
                 type="date"
                 className="form-control"
@@ -223,14 +223,14 @@ function EducationManager() {
                   onChange={(e) => setFormData({ ...formData, isCurrent: e.target.checked })}
                 />
                 <label className="form-check-label" htmlFor="isCurrent">
-                  Currently studying
+                  {language === 'en' ? 'Currently studying' : 'Actuellement étudiant'}
                 </label>
               </div>
             </div>
 
             {!formData.isCurrent && (
               <div className="mb-3">
-                <label className="form-label">End Date</label>
+                <label className="form-label">{language === 'en' ? 'End Date' : 'Date de fin'}</label>
                 <input
                   type="date"
                   className="form-control"
@@ -241,18 +241,18 @@ function EducationManager() {
             )}
 
             <div className="mb-3">
-              <label className="form-label">Description</label>
+              <label className="form-label">{t('projects.description')}</label>
               <textarea
                 className="form-control"
                 rows={3}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Additional details about your education..."
+                placeholder={language === 'en' ? 'Additional details about your education...' : 'Détails supplémentaires sur votre éducation...'}
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Description (French)</label>
+              <label className="form-label">{t('projects.description')} (Français)</label>
               <textarea
                 className="form-control"
                 rows={3}
@@ -260,11 +260,11 @@ function EducationManager() {
                 onChange={(e) => setFormData({ ...formData, descriptionFr: e.target.value })}
                 placeholder="Détails supplémentaires sur votre éducation..."
               />
-              <small className="text-muted">Optional: French translation of the description</small>
+              <small className="text-muted">{language === 'en' ? 'Optional: French translation of the description' : 'Optionnel : traduction française de la description'}</small>
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Display Order</label>
+              <label className="form-label">{language === 'en' ? 'Display Order' : 'Ordre d\'affichage'}</label>
               <input
                 type="number"
                 className="form-control"
@@ -275,11 +275,11 @@ function EducationManager() {
 
             <div className="d-flex gap-2">
               <button type="submit" className="btn btn-primary">
-                {editingId ? 'Update' : 'Add'} Education
+                {editingId ? t('common.edit') : (language === 'en' ? 'Add' : 'Ajouter')}
               </button>
               {editingId && (
                 <button type="button" className="btn btn-secondary" onClick={resetForm}>
-                  Cancel
+                  {t('common.cancel')}
                 </button>
               )}
             </div>
@@ -287,23 +287,23 @@ function EducationManager() {
         </div>
 
         <div className="col-md-6">
-          <h4>Current Education</h4>
+          <h4>{editingId ? (language === 'en' ? 'Edit Education' : 'Modifier l\'éducation') : (language === 'en' ? 'Current Education' : 'Éducation actuelle')}</h4>
           <div className="education-list">
             {educations.map((education) => (
               <div key={education.id} className="education-item">
                 <div className="education-info">
                   <div className="education-names">
-                    <strong>{education.degree}</strong>
-                    <span className="institution">{education.institution}</span>
+                    <strong>{language === 'fr' && education.degreeFr ? education.degreeFr : education.degree}</strong>
+                    <span className="institution">{language === 'fr' && education.institutionFr ? education.institutionFr : education.institution}</span>
                   </div>
                   <div className="education-dates">
                     <small>
                       {new Date(education.startDate).toLocaleDateString()} 
-                      {education.isCurrent ? ' - Present' : education.endDate ? ` - ${new Date(education.endDate).toLocaleDateString()}` : ''}
+                      {education.isCurrent ? (language === 'en' ? ' - Present' : ' - Présent') : education.endDate ? ` - ${new Date(education.endDate).toLocaleDateString()}` : ''}
                     </small>
                   </div>
                   {education.isCurrent && (
-                    <span className="badge bg-success ms-2">Current</span>
+                    <span className="badge bg-success ms-2">{language === 'en' ? 'Current' : 'Actuel'}</span>
                   )}
                 </div>
                 <div className="education-actions">
@@ -324,7 +324,7 @@ function EducationManager() {
             ))}
             {educations.length === 0 && (
               <div className="text-center text-muted py-3">
-                <p>No education entries yet. Add one above!</p>
+                <p>{language === 'en' ? 'No education entries yet. Add one above!' : 'Aucune entrée d\'éducation pour l\'instant. Ajoutez-en une ci-dessus!'}</p>
               </div>
             )}
           </div>
