@@ -84,54 +84,77 @@
   font-size: 4rem;
   font-weight: 800;
   margin-bottom: 2rem;
-  background: linear-gradient(135deg, #66bbff 0%, #2a6ee6 50%, #5eacff 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  color: #66bbff;
-  animation: glow 3s ease-in-out infinite;
+  
+  /* Gradient text - iOS-safe pattern */
+  background: linear-gradient(135deg, #66bbff 0%, #2a6ee6 50%, #5eacff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  
   letter-spacing: -2px;
   min-height: 5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  
+  /* Performance stability for iOS */
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  
+  /* Glow animation using text-shadow (stable on WebKit) */
+  animation: glowText 3s ease-in-out infinite alternate;
 }
 
-/* Mobile Safari fix - simplify rendering */
+/* Mobile responsive - no need to disable gradient */
 @media (max-width: 768px) {
   .hero-title {
     font-size: 2.5rem;
     min-height: auto;
-    animation: glow-mobile 3s ease-in-out infinite;
-    /* Fallback for Safari mobile */
-    color: #66bbff !important;
+  }
+  
+  /* Disable heavy orb animations on mobile for iOS stability */
+  .home-page::before,
+  .home-page::after {
+    animation: none;
   }
 }
 
-@keyframes glow-mobile {
-  0%, 100% { filter: brightness(1) drop-shadow(0 0 15px rgba(102, 187, 255, 0.3)); }
-  50% { filter: brightness(1.1) drop-shadow(0 0 20px rgba(102, 187, 255, 0.4)); }
+/* Stable text-shadow animation for all browsers including iOS */
+@keyframes glowText {
+  from {
+    text-shadow:
+      0 0 10px rgba(102, 187, 255, 0.3),
+      0 0 20px rgba(102, 187, 255, 0.2);
+  }
+  to {
+    text-shadow:
+      0 0 20px rgba(102, 187, 255, 0.6),
+      0 0 40px rgba(102, 187, 255, 0.4);
+  }
 }
 
 .home-page.theme-light .hero-title {
-  background: linear-gradient(135deg, #2a6ee6 0%, #4a8eff 50%, #1e3a5f 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  color: #2a6ee6;
-  filter: drop-shadow(0 2px 4px rgba(42, 110, 230, 0.2));
+  background: linear-gradient(135deg, #2a6ee6 0%, #4a8eff 50%, #1e3a5f 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: glowTextLight 3s ease-in-out infinite alternate;
 }
 
-/* Mobile Safari fix for light theme */
-@media (max-width: 768px) {
-  .home-page.theme-light .hero-title {
-    color: #2a6ee6 !important;
+/* Light theme glow animation */
+@keyframes glowTextLight {
+  from {
+    text-shadow:
+      0 0 8px rgba(42, 110, 230, 0.2),
+      0 0 16px rgba(42, 110, 230, 0.15);
   }
-}
-
-@keyframes glow {
-  0%, 100% { filter: brightness(1) drop-shadow(0 0 20px rgba(102, 187, 255, 0.3)); }
-  50% { filter: brightness(1.2) drop-shadow(0 0 30px rgba(102, 187, 255, 0.5)); }
+  to {
+    text-shadow:
+      0 0 16px rgba(42, 110, 230, 0.4),
+      0 0 32px rgba(42, 110, 230, 0.3);
+  }
 }
 
 .hero-subtitle {
@@ -399,6 +422,17 @@
   
   .highlight-card {
     padding: 2rem;
+  }
+  
+  /* Reduce backdrop-filter blur on mobile for iOS GPU performance */
+  .highlights-section {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .highlight-card {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
   }
 }
 
