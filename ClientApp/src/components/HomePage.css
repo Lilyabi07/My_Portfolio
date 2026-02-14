@@ -85,7 +85,7 @@
   font-weight: 800;
   margin-bottom: 2rem;
   
-  /* iOS-stable gradient text */
+  /* Gradient text - iOS-safe pattern */
   background: linear-gradient(135deg, #66bbff 0%, #2a6ee6 50%, #5eacff 100%);
   background-clip: text;
   -webkit-background-clip: text;
@@ -94,28 +94,34 @@
   letter-spacing: -2px;
   min-height: 5rem;
   
-  /* Safer for text rendering than flex */
   display: inline-block;
   width: 100%;
   text-align: center;
   
-  /* Force stable GPU compositing */
+  /* Performance stability for iOS */
   transform: translateZ(0);
   will-change: transform;
   backface-visibility: hidden;
   
-  /* Stable glow animation using text-shadow */
+  /* Glow animation using text-shadow (stable on WebKit) */
   animation: glowText 3s ease-in-out infinite alternate;
 }
 
-.home-page.theme-light .hero-title {
-  background: linear-gradient(135deg, #2a6ee6 0%, #4a8eff 50%, #1e3a5f 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: glowTextLight 3s ease-in-out infinite alternate;
+/* Mobile responsive - no need to disable gradient */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+    min-height: auto;
+  }
+  
+  /* Disable heavy orb animations on mobile for iOS stability */
+  .home-page::before,
+  .home-page::after {
+    animation: none;
+  }
 }
 
+/* Stable text-shadow animation for all browsers including iOS */
 @keyframes glowText {
   from {
     text-shadow:
@@ -129,6 +135,15 @@
   }
 }
 
+.home-page.theme-light .hero-title {
+  background: linear-gradient(135deg, #2a6ee6 0%, #4a8eff 50%, #1e3a5f 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: glowTextLight 3s ease-in-out infinite alternate;
+}
+
+/* Light theme glow animation */
 @keyframes glowTextLight {
   from {
     text-shadow:
@@ -407,6 +422,17 @@
   
   .highlight-card {
     padding: 2rem;
+  }
+  
+  /* Reduce backdrop-filter blur on mobile for iOS GPU performance */
+  .highlights-section {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .highlight-card {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
   }
 }
 
