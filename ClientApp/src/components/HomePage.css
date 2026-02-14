@@ -98,7 +98,7 @@
   width: 100%;
   text-align: center;
   
-  /* Performance stability for iOS */
+  /* Performance stability for iOS 
   transform: translateZ(0);
   will-change: transform;
   backface-visibility: hidden;
