@@ -112,6 +112,8 @@
   .hero-title {
     font-size: 2.5rem;
     min-height: auto;
+    animation: none;
+    text-shadow: none;
   }
   
   /* Disable heavy orb animations on mobile for iOS stability */
