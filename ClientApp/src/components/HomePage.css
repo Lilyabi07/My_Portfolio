@@ -81,11 +81,24 @@
 }
 
 .hero-title {
+
   font-size: 4rem;
   font-weight: 800;
   margin-bottom: 2rem;
+  letter-spacing: -2px;
+  min-height: 5rem;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  color: #66bbff;
+
+
   
-  /* Gradient text - iOS-safe pattern */
+  /* font-size: 4rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  
+  /* Gradient text - iOS-safe pattern 
   background: linear-gradient(135deg, #66bbff 0%, #2a6ee6 50%, #5eacff 100%);
   background-clip: text;
   -webkit-background-clip: text;
@@ -96,7 +109,7 @@
   
   display: inline-block;
   width: 100%;
-  text-align: center;
+  text-align: center; */
   
   /* Performance stability for iOS 
   transform: translateZ(0);
@@ -114,6 +127,12 @@
     min-height: auto;
     animation: none;
     text-shadow: none;
+      
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    color: #66bbff; /* or white, or whatever you prefer */
+
   }
   
   /* Disable heavy orb animations on mobile for iOS stability */
@@ -138,10 +157,11 @@
 }
 
 .home-page.theme-light .hero-title {
-  background: linear-gradient(135deg, #2a6ee6 0%, #4a8eff 50%, #1e3a5f 100%);
+    color: #0b409c;
+  /* background: linear-gradient(135deg, #2a6ee6 0%, #4a8eff 50%, #1e3a5f 100%);
   background-clip: text;
   -webkit-background-clip: text;
-  color: transparent;
+  color: transparent; */
   /* animation: glowTextLight 3s ease-in-out infinite alternate; */
 }
 
