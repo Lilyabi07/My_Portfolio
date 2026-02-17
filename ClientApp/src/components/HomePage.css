@@ -104,7 +104,7 @@
   backface-visibility: hidden;
   
   /* Glow animation using text-shadow (stable on WebKit) */
-  animation: glowText 3s ease-in-out infinite alternate;
+  /* animation: glowText 3s ease-in-out infinite alternate; */
 }
 
 /* Mobile responsive - no need to disable gradient */
@@ -142,7 +142,7 @@
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  animation: glowTextLight 3s ease-in-out infinite alternate;
+  /* animation: glowTextLight 3s ease-in-out infinite alternate; */
 }
 
 /* Light theme glow animation */
