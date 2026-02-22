@@ -128,13 +128,13 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
             <div className="notification-icon">
               <i className="fas fa-check-circle"></i>
             </div>
-            <h3>Testimonial Submitted!</h3>
-            <p>Thank you for sharing your experience. Your testimonial has been received and will be reviewed by our admin before appearing on the site.</p>
+            <h3>{t('testimonials.submittedTitle')}</h3>
+            <p>{t('testimonials.reviewNotice')}</p>
             <button 
               className="btn btn-sm btn-outline-light"
               onClick={() => setShowSuccessPopup(false)}
             >
-              Got it
+              {t('common.gotIt')}
             </button>
           </div>
         </div>
@@ -278,7 +278,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                     </div>
                   )}
                   <form onSubmit={handleSubmit}>
-                  {/* Honeypot field - hidden from users, only bots fill this */}
+                  {/* Honeypot field - hidden from users, only bots fill this, */}
                   <input
                     type="text"
                     name="website"
@@ -306,7 +306,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                   <div className="row">
                     <div className="col-md-6 mb-3">
                       <label htmlFor="title" className="form-label">
-                        {t('testimonials.title')} <span className="text-danger">*</span>
+                        {t('testimonials.jobTitle')} <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
@@ -316,7 +316,7 @@ function TestimonialsPage({ onAdminClick }: TestimonialsPageProps) {
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         required
                         maxLength={100}
-                        placeholder={t('testimonials.title')}
+                        placeholder={t('testimonials.jobTitle')}
                       />
                     </div>
                     <div className="col-md-6 mb-3">
