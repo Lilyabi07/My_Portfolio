@@ -24,6 +24,7 @@ function ContactMessagesManager() {
     isOpen: false,
     id: 0
   });
+  const [filter, setFilter] = useState<'all' | 'read' | 'unread'>('all');
   const { t, language } = useLanguage();
 
   const authConfig = {
@@ -87,6 +88,12 @@ function ContactMessagesManager() {
 
   const unreadCount = messages.filter(m => !m.isRead).length;
 
+  const filteredMessages = messages.filter(msg => {
+    if (filter === 'read') return msg.isRead;
+    if (filter === 'unread') return !msg.isRead;
+    return true; // 'all'
+  });
+
   if (loading) {
     return (
       <div className="text-center">
@@ -127,8 +134,32 @@ function ContactMessagesManager() {
       />
 
       <div className="messages-header mb-3">
-        <span className="badge bg-primary">{messages.length} {language === 'en' ? 'Total' : 'Au total'}</span>
-        {unreadCount > 0 && <span className="badge bg-warning ms-2">{unreadCount} {language === 'en' ? 'Unread' : 'Non lus'}</span>}
+        <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div className="badges">
+            <span className="badge bg-primary">{messages.length} {language === 'en' ? 'Total' : 'Au total'}</span>
+            {unreadCount > 0 && <span className="badge bg-warning ms-2">{unreadCount} {language === 'en' ? 'Unread' : 'Non lus'}</span>}
+          </div>
+          <div className="filter-buttons btn-group" role="group">
+            <button
+              className={`btn btn-sm ${filter === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => setFilter('all')}
+            >
+              {language === 'en' ? 'All' : 'Tous'}
+            </button>
+            <button
+              className={`btn btn-sm ${filter === 'unread' ? 'btn-warning' : 'btn-outline-warning'}`}
+              onClick={() => setFilter('unread')}
+            >
+              {language === 'en' ? 'Unread' : 'Non lus'}
+            </button>
+            <button
+              className={`btn btn-sm ${filter === 'read' ? 'btn-success' : 'btn-outline-success'}`}
+              onClick={() => setFilter('read')}
+            >
+              {language === 'en' ? 'Read' : 'Lus'}
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="row">
@@ -136,17 +167,17 @@ function ContactMessagesManager() {
         <div className="col-lg-6">
           <div className="card">
             <div className="card-header">
-                <h5 className="mb-0"><i className="fas fa-inbox"></i> {language === 'en' ? 'Messages' : 'Messages'} ({messages.length})</h5>
+                <h5 className="mb-0"><i className="fas fa-inbox"></i> {language === 'en' ? 'Messages' : 'Messages'} ({filteredMessages.length})</h5>
             </div>
             <div className="card-body p-0">
-              {messages.length === 0 ? (
+              {filteredMessages.length === 0 ? (
                 <div className="text-center text-muted py-5">
                   <i className="fas fa-inbox fa-3x mb-3"></i>
-                  <p>{language === 'en' ? 'No messages yet' : 'Aucun message pour le moment'}</p>
+                  <p>{language === 'en' ? 'No messages found' : 'Aucun message trouvé'}</p>
                 </div>
               ) : (
                 <div className="messages-list">
-                  {messages.map((msg) => (
+                  {filteredMessages.map((msg) => (
                     <div
                       key={msg.id}
                       className={`message-item ${!msg.isRead ? 'unread' : ''} ${selectedMessage?.id === msg.id ? 'active' : ''}`}

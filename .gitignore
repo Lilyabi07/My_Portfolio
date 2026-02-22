@@ -8,6 +8,12 @@ wwwroot/uploads/*
 .env
 .env.local
 
+# Configuration files with secrets
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.json
+!appsettings.json
+
 # IDE files
 .vscode/
 .idea/

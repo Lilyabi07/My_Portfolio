@@ -130,7 +130,7 @@ function Navigation({ isLoggedIn = false, onAdminClick, onLogout }: NavigationPr
                 title={t('common.language')}
                 aria-label={t('common.language')}
               >
-                <i className="fas fa-globe"></i> {language.toUpperCase()}
+                <i className="fas fa-globe"></i> {language === 'en' ? 'FR' : 'EN'}
               </button>
             </li>
           </ul>

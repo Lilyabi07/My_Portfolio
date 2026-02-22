@@ -385,11 +385,11 @@
 }
 
 .notification-content {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: linear-gradient(135deg, #8ecfff 0%, #66bbff 50%, #4a8eff 100%);
   color: white;
   padding: 3rem 2.5rem;
   border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 40px rgba(42, 110, 230, 0.35);
   max-width: 500px;
   text-align: center;
   animation: slideUp 0.4s ease;
@@ -444,7 +444,7 @@
 
 .notification-content .btn:hover {
   background: white;
-  color: #28a745;
+  color: #2a6ee6;
   transform: translateY(-2px);
 }
 
@@ -484,15 +484,15 @@
   padding: 1.5rem;
 }
 
-.form-label {
-  color: #b8d4f1;
+.modal-content .form-label {
+  color: #f5f1dc;
   font-weight: 600;
   margin-bottom: 0.5rem;
   transition: color 0.4s ease-in-out;
 }
 
-.testimonials-page.theme-light .form-label {
-  color: #2c3e50;
+.testimonials-page.theme-light .modal-content .form-label {
+  color: #e5e4df;
 }
 
 .form-control,

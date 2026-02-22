@@ -62,7 +62,7 @@ function Login({ onLoginSuccess }: LoginProps) {
       <div className="login-card">
         <div className="login-header">
           <i className="fas fa-user-shield"></i>
-          <h2>{t('admin.login')}</h2>
+          <h2>{t('login.title')}</h2>
         </div>
 
         {error && <div className="alert alert-danger">{error}</div>}

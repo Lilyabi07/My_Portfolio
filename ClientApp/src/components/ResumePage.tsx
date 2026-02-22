@@ -3,7 +3,7 @@ import Navigation from './Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useFetchData } from '../hooks';
-import { formatMonthYear, sortByDisplayOrder } from '../utils/formatters';
+import { formatMonthYear, sortByDateDescending } from '../utils/formatters';
 import './ResumePage.css';
 
 interface WorkExperience {
@@ -41,9 +41,9 @@ function ResumePage({ onAdminClick }: ResumePageProps) {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
 
-  // Sort data
-  const experiences = sortByDisplayOrder(experiencesRaw);
-  const educations = sortByDisplayOrder(educationsRaw);
+  // Sort data by date in reverse chronological order (most recent first)
+  const experiences = sortByDateDescending(experiencesRaw);
+  const educations = sortByDateDescending(educationsRaw);
   const loading = loadingExp || loadingEdu;
   const error = errorExp || errorEdu;
 

@@ -83,8 +83,24 @@ INSERT INTO skills (name_en, name_es, percentage, icon, display_order) VALUES
 ('MySQL', 'MySQL', 75, 'fas fa-database', 4);
 
 -- Insert sample project
-INSERT INTO projects (title_en, title_es, description_en, description_es, technologies, display_order) VALUES
-('Portfolio Website', 'Sitio Web de Portafolio', 
- 'A dynamic portfolio website with admin panel', 
- 'Un sitio web de portafolio dinámico con panel de administración',
- 'PHP, MySQL, JavaScript, Bootstrap', 1);
+INSERT INTO projects (
+    TitleEn,
+    TitleFr,
+    DescriptionEn,
+    DescriptionFr,
+    Technologies,
+    ImageUrl,
+    ProjectUrl,
+    GithubUrl,
+    DisplayOrder
+) VALUES (
+    'Portfolio Website',
+    'Site Web de Portfolio',
+    'A dynamic portfolio website with admin panel',
+    'Un site de portfolio dynamique avec un panneau d\'administration',
+    'PHP, MySQL, JavaScript, Bootstrap',
+    NULL,
+    NULL,
+    NULL,
+    1
+);

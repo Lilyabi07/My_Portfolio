@@ -5,7 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useScrollAnimation } from '../hooks';
 import { LoadingSkeleton, EmptyState } from './common';
-import { formatMonthYear, sortByDisplayOrder } from '../utils/formatters';
+import { formatMonthYear, sortByDateDescending } from '../utils/formatters';
 import './EducationPage.css';
 
 interface Education {
@@ -43,7 +43,7 @@ function EducationPage({ onAdminClick }: EducationPageProps) {
       setError(null);
       const response = await api.get('/education');
       if (Array.isArray(response.data)) {
-        setEducations(sortByDisplayOrder(response.data));
+        setEducations(sortByDateDescending(response.data));
       } else {
         setError(t('education.invalidData'));
       }

@@ -31,7 +31,7 @@ function AppContent() {
   const handleLoginSuccess = (username: string) => {
     setAdminUsername(username);
     setIsLoggedIn(true);
-    navigate('/admin/dashboard');
+    navigate('/dashboard');
   };
 
   const handleLogout = () => {
@@ -42,16 +42,16 @@ function AppContent() {
   };
 
   const handleAdminClick = () => {
-    navigate('/admin/login');
+    navigate('/login/dashboard');
   };
 
   return (
     <div className={`App theme-${theme}`}>
       <Routes>
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<PageTransition><Login onLoginSuccess={handleLoginSuccess} /></PageTransition>} />
+        {/* Login Routes */}
+        <Route path="/login/dashboard" element={<PageTransition><Login onLoginSuccess={handleLoginSuccess} /></PageTransition>} />
         <Route
-          path="/admin/dashboard"
+          path="/dashboard"
           element={
             <PageTransition>
               {isLoggedIn ? (
