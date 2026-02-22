@@ -263,16 +263,6 @@ function EducationManager() {
               <small className="text-muted">{language === 'en' ? 'Optional: French translation of the description' : 'Optionnel : traduction française de la description'}</small>
             </div>
 
-            <div className="mb-3">
-              <label className="form-label">{language === 'en' ? 'Display Order' : 'Ordre d\'affichage'}</label>
-              <input
-                type="number"
-                className="form-control"
-                value={formData.displayOrder}
-                onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value, 10) })}
-              />
-            </div>
-
             <div className="d-flex gap-2">
               <button type="submit" className="btn btn-primary">
                 {editingId ? t('common.edit') : (language === 'en' ? 'Add' : 'Ajouter')}
