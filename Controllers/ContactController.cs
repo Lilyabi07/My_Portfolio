@@ -18,8 +18,10 @@ namespace MyPortfolio.Controllers
         private readonly IEmailService _emailService;
         private readonly IProfanityFilterService _profanityFilter;
         private readonly IRateLimitService _rateLimitService;
+        private readonly ITurnstileVerificationService _turnstileVerificationService;
+        private readonly IWebHostEnvironment _environment;
 
-        public ContactController(ApplicationDbContext db, INotificationService notifications, IConfiguration configuration, ILogger<ContactController> logger, IEmailService emailService, IProfanityFilterService profanityFilter, IRateLimitService rateLimitService)
+        public ContactController(ApplicationDbContext db, INotificationService notifications, IConfiguration configuration, ILogger<ContactController> logger, IEmailService emailService, IProfanityFilterService profanityFilter, IRateLimitService rateLimitService, ITurnstileVerificationService turnstileVerificationService, IWebHostEnvironment environment)
         {
             _db = db;
             _notifications = notifications;
@@ -28,6 +30,8 @@ namespace MyPortfolio.Controllers
             _emailService = emailService;
             _profanityFilter = profanityFilter;
             _rateLimitService = rateLimitService;
+            _turnstileVerificationService = turnstileVerificationService;
+            _environment = environment;
         }
 
         [HttpGet]
@@ -133,12 +137,31 @@ namespace MyPortfolio.Controllers
         }
 
         [HttpPost("send")]
-        public async Task<IActionResult> SendContactMessage([FromBody] ContactMessage message)
+        public async Task<IActionResult> SendContactMessage([FromBody] ContactSubmissionRequest request)
         {
-            if (message == null || string.IsNullOrWhiteSpace(message.Name) || 
-                string.IsNullOrWhiteSpace(message.Email) || string.IsNullOrWhiteSpace(message.Message))
+            if (request == null || string.IsNullOrWhiteSpace(request.Name) || 
+                string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Message))
             {
                 return BadRequest(new { message = "All fields are required." });
+            }
+
+            var turnstileResult = await _turnstileVerificationService.VerifyAsync(
+                request.TurnstileToken,
+                RateLimitService.GetClientIdentifier(HttpContext));
+
+            if (!turnstileResult.IsConfigured)
+            {
+                if (!_environment.IsDevelopment())
+                {
+                    _logger.LogWarning("Contact submission blocked because Turnstile is not configured in non-development environment.");
+                    return StatusCode(503, new { message = "Contact form protection is not configured. Please try again later." });
+                }
+
+                _logger.LogWarning("Turnstile not configured in development environment; continuing without Turnstile verification.");
+            }
+            else if (!turnstileResult.Success)
+            {
+                return BadRequest(new { message = "Security verification failed. Please try again." });
             }
 
             // Rate limit: 5 messages per IP per 1 hour
@@ -154,7 +177,7 @@ namespace MyPortfolio.Controllers
                 return rateLimitError;
 
             // Check for profanity in message and name
-            var combinedText = $"{message.Name} {message.Message}";
+            var combinedText = $"{request.Name} {request.Message}";
             var profanityCheck = _profanityFilter.CheckProfanity(combinedText);
 
             if (profanityCheck.HasProfanity)
@@ -166,8 +189,15 @@ namespace MyPortfolio.Controllers
 
             try
             {
+                var message = new ContactMessage
+                {
+                    Name = request.Name.Trim(),
+                    Email = request.Email.Trim(),
+                    Message = request.Message.Trim(),
+                    SubmittedAt = DateTime.UtcNow
+                };
+
                 // Save message to database
-                message.SubmittedAt = DateTime.UtcNow;
                 await _db.ContactMessages.AddAsync(message);
                 await _db.SaveChangesAsync();
 
@@ -186,6 +216,14 @@ namespace MyPortfolio.Controllers
                 _logger.LogError(ex, "Error processing contact form");
                 return StatusCode(500, new { message = "Failed to send message. Please try again later." });
             }
+        }
+
+        public class ContactSubmissionRequest
+        {
+            public string Name { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
+            public string Message { get; set; } = string.Empty;
+            public string? TurnstileToken { get; set; }
         }
     }
 }

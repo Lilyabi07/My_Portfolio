@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using MyPortfolio.Data;
 using MyPortfolio.Hubs;
 using MyPortfolio.Services;
+using System.Security.Claims;
 using System.Text;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +34,10 @@ builder.Services.AddScoped<IProfanityFilterService, ProfanityFilterService>();
 
 // Register RateLimitService (singleton for in-memory rate limiting)
 builder.Services.AddSingleton<IRateLimitService, RateLimitService>();
+
+// Register HTTP client + Turnstile verification service
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<ITurnstileVerificationService, TurnstileVerificationService>();
 
 // Configure forwarded headers for proxy/load balancer (Render uses this)
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -63,7 +68,11 @@ builder.Services.AddCors(options =>
 });
 
 // Add JWT Authentication
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "YourSuperSecretKeyThatIsAtLeast32CharactersLong";
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
+{
+    throw new InvalidOperationException("Jwt:Key is missing or too short. Configure a secure key with at least 32 characters.");
+}
 var key = Encoding.ASCII.GetBytes(jwtKey);
 
 builder.Services.AddAuthentication(options =>
@@ -77,10 +86,23 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "MyPortfolio",
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "MyPortfolioUsers",
+        ValidateLifetime = true,
+        RoleClaimType = ClaimTypes.Role,
+        ClockSkew = TimeSpan.FromMinutes(1)
     };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireAuthenticatedUser()
+              .RequireRole("admin"));
+
+    options.DefaultPolicy = options.GetPolicy("AdminOnly")!;
 });
 
 // Add SPA static files
@@ -108,6 +130,28 @@ using (var scope = app.Services.CreateScope())
 
 // Use forwarded headers from proxy/load balancer
 app.UseForwardedHeaders();
+
+// Baseline security headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    context.Response.Headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()";
+    context.Response.Headers["Content-Security-Policy"] =
+        "default-src 'self'; " +
+        "base-uri 'self'; " +
+        "frame-ancestors 'none'; " +
+        "frame-src 'self' https://challenges.cloudflare.com; " +
+        "form-action 'self'; " +
+        "img-src 'self' data: https:; " +
+        "style-src 'self' 'unsafe-inline' https:; " +
+        "script-src 'self' 'unsafe-inline' https:; " +
+        "font-src 'self' data: https:; " +
+        "connect-src 'self' https: wss:;";
+
+    await next();
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

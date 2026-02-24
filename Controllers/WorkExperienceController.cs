@@ -43,11 +43,14 @@ namespace MyPortfolio.Controllers
             if (existing == null) return false;
 
             existing.Company = updated.Company ?? existing.Company;
+            existing.CompanyFr = updated.CompanyFr;
             existing.Position = updated.Position ?? existing.Position;
+            existing.PositionFr = updated.PositionFr;
             existing.StartDate = updated.StartDate;
             existing.EndDate = updated.EndDate;
             existing.IsCurrent = updated.IsCurrent;
             existing.Description = updated.Description ?? existing.Description;
+            existing.DescriptionFr = updated.DescriptionFr;
             existing.DisplayOrder = updated.DisplayOrder;
 
             _db.WorkExperiences.Update(existing);

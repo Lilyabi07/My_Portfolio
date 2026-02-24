@@ -7,8 +7,11 @@ import './WorkExperienceManager.css';
 interface WorkExperience {
   id: number;
   company: string;
+  companyFr?: string;
   position: string;
+  positionFr?: string;
   description: string;
+  descriptionFr?: string;
   startDate: string;
   endDate: string;
   isCurrent: boolean;
@@ -21,8 +24,11 @@ function WorkExperienceManager() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<Omit<WorkExperience, 'id'>>({
     company: '',
+    companyFr: '',
     position: '',
+    positionFr: '',
     description: '',
+    descriptionFr: '',
     startDate: '',
     endDate: '',
     isCurrent: false,
@@ -95,8 +101,11 @@ function WorkExperienceManager() {
     setEditingId(exp.id);
     setFormData({
       company: exp.company,
+      companyFr: exp.companyFr || '',
       position: exp.position,
+      positionFr: exp.positionFr || '',
       description: exp.description,
+      descriptionFr: exp.descriptionFr || '',
       startDate: exp.startDate,
       endDate: exp.endDate,
       isCurrent: exp.isCurrent,
@@ -108,8 +117,11 @@ function WorkExperienceManager() {
     setEditingId(null);
     setFormData({
       company: '',
+      companyFr: '',
       position: '',
+      positionFr: '',
       description: '',
+      descriptionFr: '',
       startDate: '',
       endDate: '',
       isCurrent: false,
@@ -154,6 +166,17 @@ function WorkExperienceManager() {
             </div>
 
             <div className="mb-3">
+              <label className="form-label">{language === 'en' ? 'Company (French)' : 'Entreprise (français)'}</label>
+              <input
+                type="text"
+                className="form-control"
+                value={formData.companyFr}
+                onChange={(e) => setFormData({ ...formData, companyFr: e.target.value })}
+                placeholder={language === 'en' ? 'Optional French translation' : 'Traduction française optionnelle'}
+              />
+            </div>
+
+            <div className="mb-3">
               <label className="form-label">{language === 'en' ? 'Position' : 'Poste'}</label>
               <input
                 type="text"
@@ -165,12 +188,34 @@ function WorkExperienceManager() {
             </div>
 
             <div className="mb-3">
+              <label className="form-label">{language === 'en' ? 'Position (French)' : 'Poste (français)'}</label>
+              <input
+                type="text"
+                className="form-control"
+                value={formData.positionFr}
+                onChange={(e) => setFormData({ ...formData, positionFr: e.target.value })}
+                placeholder={language === 'en' ? 'Optional French translation' : 'Traduction française optionnelle'}
+              />
+            </div>
+
+            <div className="mb-3">
               <label className="form-label">{t('projects.description')}</label>
               <textarea
                 className="form-control"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={2}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">{t('projects.description')} (Français)</label>
+              <textarea
+                className="form-control"
+                value={formData.descriptionFr}
+                onChange={(e) => setFormData({ ...formData, descriptionFr: e.target.value })}
+                rows={2}
+                placeholder={language === 'en' ? 'Optional French translation' : 'Traduction française optionnelle'}
               />
             </div>
 
@@ -234,12 +279,18 @@ function WorkExperienceManager() {
         <div className="col-md-6">
           <h4>{language === 'en' ? 'Timeline' : 'Chronologie'}</h4>
           <div className="timeline">
-            {experiences.map(exp => (
+            {experiences.map(exp => {
+              const displayPosition = language === 'fr' && exp.positionFr ? exp.positionFr : exp.position;
+              const displayCompany = language === 'fr' && exp.companyFr ? exp.companyFr : exp.company;
+              const displayDescription = language === 'fr' && exp.descriptionFr ? exp.descriptionFr : exp.description;
+
+              return (
               <div key={exp.id} className="timeline-item">
                 <div className="timeline-marker"></div>
                 <div className="timeline-content">
-                  <h5>{exp.position}</h5>
-                  <p className="company">{exp.company}</p>
+                  <h5>{displayPosition}</h5>
+                  <p className="company">{displayCompany}</p>
+                  {displayDescription && <small className="text-muted d-block mb-1">{displayDescription}</small>}
                   <p className="dates">
                     {new Date(exp.startDate).toLocaleDateString()} - {' '}
                     {exp.isCurrent ? <span className="badge bg-success">{language === 'en' ? 'Current' : 'Actuel'}</span> : new Date(exp.endDate).toLocaleDateString()}
@@ -260,7 +311,7 @@ function WorkExperienceManager() {
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </div>
