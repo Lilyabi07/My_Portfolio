@@ -1,0 +1,66 @@
+name: CI + Security Checks
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  backend:
+    name: Backend Build / Test / Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore MyPortfolio.sln
+
+      - name: Build
+        run: dotnet build MyPortfolio.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test Tests/MyPortfolio.Tests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Check NuGet vulnerabilities
+        shell: bash
+        run: |
+          dotnet list MyPortfolio.sln package --vulnerable --include-transitive | tee nuget-vuln-report.txt
+          if grep -qi "has the following vulnerable packages" nuget-vuln-report.txt; then
+            echo "Vulnerable NuGet packages detected."
+            exit 1
+          fi
+
+  frontend:
+    name: Frontend Build / npm Audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ClientApp
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ClientApp/package.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Check npm vulnerabilities (high/critical)
+        run: npm audit --audit-level=high

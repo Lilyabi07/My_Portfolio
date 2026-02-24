@@ -1,86 +1,181 @@
-# My Portfolio - Dynamic Portfolio Website
+# My Portfolio
 
-A fully responsive, dynamic portfolio website with an admin panel. Built using React for the frontend and ASP.NET for the backend, following MVC architecture with bilingual support (English/French).
+Dynamic portfolio website with a React (Vite) frontend and ASP.NET Core backend, including an authenticated admin panel and bilingual content support (English/French).
 
-## Available Technology Stacks
+## Tech Stack
 
-### Option 2: ASP.NET + React Stack
-- **Backend:** ASP.NET Core 8.0 MVC
-- **Database:** MySQL/SQL Server
-- **Frontend:** React 18 with TypeScript
-- **Architecture:** MVC + SPA
+- Backend: ASP.NET Core 8 Web API + MVC hosting
+- Frontend: React 18 + TypeScript + Vite
+- Database: SQL Server (Entity Framework Core)
+- Realtime admin updates: SignalR
+- Deployment target: Azure App Service
 
-## Features
+## Core Features
 
-### Public Website
--  Fully responsive design (mobile & desktop)
-- Dynamic content from database
-- Bilingual support (English/French)
-- Skills showcase with progress bars
-- Projects portfolio with optional images
-- Work experience timeline
-- Modern, professional design with Bootstrap 5
+- Public portfolio pages driven by database content
+- Admin authentication + CRUD management for portfolio sections
+- Bilingual content fields (EN/FR)
+- Contact form submissions saved to database and sent via SMTP email
+- Spam protection on contact form:
+   - Cloudflare Turnstile verification
+   - IP rate limiting
+   - Hidden honeypot field
+   - Minimum fill-time check
+   - Profanity filtering
 
-### Admin Panel
-- Secure login system with password hashing
-- Dashboard with statistics
-- Complete CRUD operations for:
-  - Skills
-  - Projects (with image upload)
-  - Work Experience
-- Bilingual content management
-- Immediate reflection of changes on public website
-- User-friendly interface
+## Project Structure
 
-## Technology Stack
+- `ClientApp/` React frontend
+- `Controllers/` API and admin endpoints
+- `Services/` business logic (email, anti-spam, notifications)
+- `Data/` EF Core DbContext
+- `Migrations/` EF Core migrations
 
-### ASP.NET + React Stack (New)
+## Local Setup
 
-- **Backend:** ASP.NET Core 8.0 MVC
-- **Database:** MySQL/SQL Server with Entity Framework
-- **Frontend:** React 18 + TypeScript
-- **Framework:** Bootstrap 5
-- **Icons:** Font Awesome 6
-- **Architecture:** MVC + SPA (Single Page Application)
-- **Hosting: Azure
+### Prerequisites
 
-## Installation
+- .NET 8 SDK
+- Node.js 18+
+- SQL Server LocalDB (or SQL Server)
 
-### Setup Instructions
+### 1) Clone and install
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Lilyabi07/My_Portfolio.git
-   cd My_Portfolio
-   
-2. **Manage Skills**
-   - Add/Edit/Delete skills
-   - Set skill name in both languages
-   - Set proficiency percentage
-   - Add Font Awesome icons
-   - Control display order
+```bash
+git clone https://github.com/Lilyabi07/My_Portfolio.git
+cd My_Portfolio
+cd ClientApp
+npm install
+cd ..
+```
 
-3. **Manage Projects**
-   - Add/Edit/Delete projects
-   - Upload project images (optional)
-   - Add project and GitHub URLs (optional)
-   - Describe projects in both languages
-   - List technologies used
+### 2) Configure backend secrets (`appsettings.Development.json`)
 
-4. **Manage Work Experience**
-   - Add/Edit/Delete work experiences
-   - Set company and position in both languages
-   - Define date ranges
-   - Mark current positions
-   - Control display order
+Set the values below in your local (gitignored) `appsettings.Development.json`:
 
-### Language Switching
+```json
+{
+   "ConnectionStrings": {
+      "DefaultConnection": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=MyPortfolioDb;Integrated Security=True;TrustServerCertificate=True;"
+   },
+   "Admin": {
+      "Username": "admin",
+      "Password": "your-admin-password"
+   },
+   "Jwt": {
+      "Key": "your-32+char-jwt-key",
+      "Issuer": "MyPortfolio",
+      "Audience": "MyPortfolioUsers"
+   },
+   "Email": {
+      "SmtpHost": "smtp.gmail.com",
+      "SmtpPort": "587",
+      "SmtpUsername": "your-email@example.com",
+      "SmtpPassword": "your-provider-app-password",
+      "FromEmail": "your-email@example.com",
+      "RecipientEmail": "your-email@example.com"
+   },
+   "Turnstile": {
+      "SecretKey": "your-turnstile-secret-key"
+   }
+}
+```
 
-- Click the globe icon in the navigation bar
-- Switches between English (EN) and French (FR)
-- All content updates immediately
+### 3) Configure frontend Turnstile key (`ClientApp/.env.local`)
 
-# My_Portfolio
-My final project portfolio, a website containing my career infromation. 
-Presented to A. Bar for the Comprehesive assessment course
+Create `ClientApp/.env.local` (gitignored):
+
+```env
+VITE_TURNSTILE_SITE_KEY=your-turnstile-site-key
+```
+
+### 4) Apply database migrations
+
+```bash
+dotnet ef database update --project MyPortfolio.csproj --startup-project MyPortfolio.csproj
+```
+
+### 5) Run locally
+
+Backend (from repo root):
+
+```bash
+dotnet run
+```
+
+Frontend (from `ClientApp/`):
+
+```bash
+npm run dev
+```
+
+Expected local URLs:
+
+- Frontend: `http://localhost:3000`
+- Backend: shown by `dotnet run` output (for example `https://localhost:58272`)
+
+## SMTP Contact Email Configuration (Gmail or Yahoo)
+
+Contact form emails are sent by `Services/EmailService.cs` using these keys:
+
+- `Email:SmtpHost`
+- `Email:SmtpPort`
+- `Email:SmtpUsername`
+- `Email:SmtpPassword`
+- `Email:FromEmail`
+- `Email:RecipientEmail`
+
+### Gmail values
+
+- `Email:SmtpHost` = `smtp.gmail.com`
+- `Email:SmtpPort` = `587`
+- `Email:SmtpUsername` = your full Gmail address
+- `Email:SmtpPassword` = Google App Password
+- `Email:FromEmail` = usually same Gmail address
+- `Email:RecipientEmail` = inbox to receive contact form messages
+
+### Yahoo values
+
+- `Email:SmtpHost` = `smtp.mail.yahoo.com`
+- `Email:SmtpPort` = `587`
+- `Email:SmtpUsername` = your full Yahoo address
+- `Email:SmtpPassword` = Yahoo App Password
+- `Email:FromEmail` = usually same Yahoo address
+- `Email:RecipientEmail` = inbox to receive contact form messages
+
+Both Gmail and Yahoo require an app password generated from the provider account security settings.
+
+## Cloudflare Turnstile Configuration
+
+1. Create a widget in Cloudflare Turnstile (Managed mode recommended).
+2. Add allowed hostnames (for example `localhost` and your production host).
+3. Put the Site Key in `ClientApp/.env.local` as `VITE_TURNSTILE_SITE_KEY`.
+4. Put the Secret Key in backend config as `Turnstile:SecretKey`.
+
+## Production (Azure) Settings
+
+Set these Application Settings in Azure App Service:
+
+- `ConnectionStrings__DefaultConnection`
+- `Admin__Username`
+- `Admin__Password`
+- `Jwt__Key`
+- `Jwt__Issuer`
+- `Jwt__Audience`
+- `Email__SmtpHost` = `smtp.gmail.com` or `smtp.mail.yahoo.com`
+- `Email__SmtpPort` = `587`
+- `Email__SmtpUsername`
+- `Email__SmtpPassword`
+- `Email__FromEmail`
+- `Email__RecipientEmail`
+- `Turnstile__SecretKey`
+
+For the frontend build/deploy, provide:
+
+- `VITE_TURNSTILE_SITE_KEY`
+
+## Notes
+
+- Do not commit `.env.local` or secret-bearing appsettings files.
+- `appsettings.json` and `ClientApp/.env.example` should contain placeholders only.
 

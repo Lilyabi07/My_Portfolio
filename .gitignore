@@ -70,3 +70,4 @@ ClientApp/build/
 # Build results
 dist/
 build/
+publish/
