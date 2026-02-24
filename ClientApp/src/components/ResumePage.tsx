@@ -9,10 +9,13 @@ import './ResumePage.css';
 interface WorkExperience {
   id: number;
   company: string;
+  companyFr?: string;
   position: string;
+  positionFr?: string;
   startDate: string;
   endDate?: string;
   description: string;
+  descriptionFr?: string;
   location?: string;
   displayOrder: number;
 }
@@ -132,19 +135,24 @@ function ResumePage({ onAdminClick }: ResumePageProps) {
             </div>
           ) : (
             <div className="timeline">
-              {experiences.map((exp, index) => (
+              {experiences.map((exp, index) => {
+                const displayPosition = language === 'fr' && exp.positionFr ? exp.positionFr : exp.position;
+                const displayCompany = language === 'fr' && exp.companyFr ? exp.companyFr : exp.company;
+                const displayDescription = language === 'fr' && exp.descriptionFr ? exp.descriptionFr : exp.description;
+
+                return (
                 <div key={exp.id} className="timeline-item">
                   <div className="timeline-marker"></div>
                   <div className="timeline-content">
                     <div className="experience-card">
                       <div className="experience-header">
-                        <h3 className="position">{exp.position}</h3>
+                        <h3 className="position">{displayPosition}</h3>
                         <span className="date-range">
                           {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : t('resume.present')}
                         </span>
                       </div>
                       <div className="company-info">
-                        <h4 className="company">{exp.company}</h4>
+                        <h4 className="company">{displayCompany}</h4>
                         {exp.location && (
                           <span className="location">
                             <i className="fas fa-map-marker-alt me-2"></i>
@@ -152,11 +160,11 @@ function ResumePage({ onAdminClick }: ResumePageProps) {
                           </span>
                         )}
                       </div>
-                      <p className="description">{exp.description}</p>
+                      <p className="description">{displayDescription}</p>
                     </div>
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
           )}
         </div>

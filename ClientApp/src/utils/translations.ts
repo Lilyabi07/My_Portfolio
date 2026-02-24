@@ -162,7 +162,7 @@ export const translations: Record<Language, Record<string, any>> = {
       title: 'Login',
     },
     admin: {
-      title: 'Admin Panel',
+      title: 'Configurations',
       login: 'Admin Login',
       username: 'Username',
       password: 'Password',
@@ -387,7 +387,7 @@ export const translations: Record<Language, Record<string, any>> = {
       title: 'Connexion',
     },
     admin: {
-      title: 'Panneau d\'administration',
+      title: 'Configurations',
       login: 'Connexion administrateur',
       username: 'Nom d\'utilisateur',
       password: 'Mot de passe',

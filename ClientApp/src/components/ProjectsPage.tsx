@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navigation from './Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -28,6 +28,26 @@ function ProjectsPage({ onAdminClick }: ProjectsPageProps) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { theme } = useTheme();
   const { t, language } = useLanguage();
+  const modalTitleId = selectedProject ? `project-modal-title-${selectedProject.id}` : undefined;
+
+  useEffect(() => {
+    if (!selectedProject) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSelectedProject(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [selectedProject]);
 
   return (
     <div className={`projects-page theme-${theme}`}>
@@ -77,13 +97,16 @@ function ProjectsPage({ onAdminClick }: ProjectsPageProps) {
       {selectedProject && (
         <div 
           className="modal show d-block" 
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={modalTitleId}
           style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
           onClick={() => setSelectedProject(null)}
         >
           <div className="modal-dialog modal-dialog-centered modal-lg" onClick={(e) => e.stopPropagation()}>
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">{language === 'fr' ? selectedProject.titleFr : selectedProject.titleEn}</h5>
+                <h5 id={modalTitleId} className="modal-title">{language === 'fr' ? selectedProject.titleFr : selectedProject.titleEn}</h5>
                 <button 
                   type="button" 
                   className="btn-close" 
@@ -163,9 +186,24 @@ function ProjectCard({ project, index, onSelect }: ProjectCardProps) {
   const description = language === 'fr' ? project.descriptionFr : project.descriptionEn;
   const techArray = project.technologies ? project.technologies.split(',').map(t => t.trim()) : [];
 
+  const handleCardKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onSelect(project);
+    }
+  };
+
   return (
     <div ref={scrollRef} className="col-md-6 col-lg-4">
-      <div className="project-card" onClick={() => onSelect(project)} style={{ cursor: 'pointer' }}>
+      <div
+        className="project-card"
+        onClick={() => onSelect(project)}
+        onKeyDown={handleCardKeyDown}
+        tabIndex={0}
+        role="button"
+        aria-label={`${title} - ${t('projects.viewDetails')}`}
+        style={{ cursor: 'pointer' }}
+      >
         {project.imageUrl && (
           <div className="project-image">
             <img src={project.imageUrl} alt={title} />
@@ -189,12 +227,12 @@ function ProjectCard({ project, index, onSelect }: ProjectCardProps) {
           )}
           <div className="project-links">
             {project.projectUrl && (
-              <a href={project.projectUrl} target="_blank" rel="noopener noreferrer" className="btn-link">
+              <a href={project.projectUrl} target="_blank" rel="noopener noreferrer" className="btn-link" onClick={(event) => event.stopPropagation()}>
                 {t('projects.viewDemo')}
               </a>
             )}
             {project.githubUrl && (
-              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="btn-link">
+              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="btn-link" onClick={(event) => event.stopPropagation()}>
                 {t('projects.sourceCode')}
               </a>
             )}

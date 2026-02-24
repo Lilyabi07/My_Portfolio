@@ -338,8 +338,9 @@
 }
 
 .home-page.theme-light .highlight-card {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(42, 110, 230, 0.2);
+  background: #ffffff !important;
+  border: 1px solid rgba(30, 74, 152, 0.35) !important;
+  box-shadow: 0 10px 24px rgba(30, 74, 152, 0.08) !important;
 }
 
 .highlight-card::before {
@@ -376,7 +377,7 @@
 }
 
 .home-page.theme-light .highlight-card h3 {
-  color: #2a6ee6;
+  color: #1d4f9c;
 }
 
 .highlight-card p {
@@ -387,7 +388,7 @@
 }
 
 .home-page.theme-light .highlight-card p {
-  color: #2c3e50;
+  color: #1f2f44;
 }
 
 .highlight-link {
@@ -402,7 +403,11 @@
 }
 
 .home-page.theme-light .highlight-link {
-  color: #2a6ee6;
+  color: #1d4f9c;
+}
+
+.home-page.theme-light .highlight-link:hover {
+  color: #153a74;
 }
 
 .highlight-link::after {
